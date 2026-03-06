@@ -11,18 +11,18 @@ import QRCode from 'qrcode';
 export async function drawQR(canvas: HTMLCanvasElement, text: string): Promise<void> {
   await QRCode.toCanvas(canvas, text, {
     width: canvas.width,
-    margin: 1,
-    color: { dark: '#1B1B1B', light: '#FFFFFF' },
-    errorCorrectionLevel: 'M',
+    margin: 2,
+    color: { dark: '#000000', light: '#FFFFFF' },
+    errorCorrectionLevel: 'H',
   });
 }
 
 /** Return a Base-64 data-URL of the QR image (useful for downloads / sharing). */
-export async function qrToDataURL(text: string, size = 200): Promise<string> {
+export async function qrToDataURL(text: string, size = 280): Promise<string> {
   return QRCode.toDataURL(text, {
     width: size,
-    margin: 1,
-    color: { dark: '#1B1B1B', light: '#FFFFFF' },
-    errorCorrectionLevel: 'M',
+    margin: 2,
+    color: { dark: '#000000', light: '#FFFFFF' },
+    errorCorrectionLevel: 'H',
   });
 }

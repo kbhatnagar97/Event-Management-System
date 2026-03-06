@@ -1,8 +1,8 @@
 # Family Day 2026 — API Contracts
 
 > **Project:** Event Management System — HashedIn by Deloitte  
-> **Version:** 1.0  
-> **Date:** March 5, 2026  
+> **Version:** 2.0  
+> **Date:** March 6, 2026  
 > **Base URL:** `{BASE_URL}/api/v1`  
 > **Content-Type:** `application/json`
 
@@ -12,15 +12,17 @@
 
 1. [Data Models](#data-models)
 2. [Endpoints](#endpoints)
+   - [GET /health](#0-health-check)
    - [POST /registration/verify-email](#1-verify-email)
-   - [POST /registration/register](#2-register-guest)
+   - [POST /registration/register](#2-register--update-guest)
    - [GET /checkin/lookup/:code](#3-lookup-guest-by-code)
-   - [POST /checkin/confirm](#4-check-in-guest)
+   - [POST /checkin](#4-check-in-guest)
    - [POST /checkin/undo](#5-undo-check-in)
    - [GET /checkin/stats](#6-get-check-in-stats)
    - [GET /checkin/guests](#7-search-guests)
 3. [Error Handling](#error-handling)
 4. [Status Codes](#status-codes)
+5. [Authentication](#authentication)
 
 ---
 
@@ -37,6 +39,7 @@
 | `code`         | `string`        | ✅       | 6-digit registration code            |
 | `adults`       | `number`        | ✅       | Number of adult family members       |
 | `kids`         | `number`        | ✅       | Number of children                   |
+| `seniors`      | `number`        | ✅       | Number of senior family members      |
 | `status`       | `GuestStatus`   | ✅       | Current registration/check-in status |
 | `checkedInAt`  | `string (ISO)`  | ❌       | Timestamp of check-in (nullable)     |
 | `checkedInBy`  | `string`        | ❌       | Method used for check-in (nullable)  |
@@ -58,6 +61,26 @@
 
 ## Endpoints
 
+> **Note:** All check-in endpoints (`/api/v1/checkin/*`) require authentication via the `Authorization` header. Registration endpoints are public. See [Authentication](#authentication).
+
+---
+
+### 0. Health Check
+
+Simple liveness probe.
+
+```
+GET /health
+```
+
+**Success Response — `200 OK`:**
+
+```json
+{
+  "status": "ok"
+}
+```
+
 ---
 
 ### 1. Verify Email
@@ -76,17 +99,42 @@ POST /api/v1/registration/verify-email
 }
 ```
 
-**Success Response — `200 OK`:**
+**Success Response (new user) — `200 OK`:**
 
 ```json
 {
   "valid": true,
   "registered": false,
-  "employeeName": "John Doe"
+  "employeeName": "John Doe",
+  "guest": null
 }
 ```
 
-> If `registered: true`, the user has already registered. FE will show appropriate messaging.
+**Success Response (already registered) — `200 OK`:**
+
+```json
+{
+  "valid": true,
+  "registered": true,
+  "employeeName": "John Doe",
+  "guest": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@deloitte.com",
+    "code": "482719",
+    "adults": 2,
+    "kids": 1,
+    "seniors": 0,
+    "status": "pending",
+    "checkedInAt": null,
+    "checkedInBy": null,
+    "createdAt": "2026-03-05T10:30:00.000Z"
+  }
+}
+```
+
+> When `registered: true`, the full guest object is returned so the FE can skip directly to the confirmation screen.
 
 **Error Response — `400 Bad Request`:**
 
@@ -99,9 +147,9 @@ POST /api/v1/registration/verify-email
 
 ---
 
-### 2. Register Guest
+### 2. Register / Update Guest
 
-Create a new guest registration with family member details.
+Create a new guest registration, or **update an existing one** if the email is already registered (upsert).
 
 ```
 POST /api/v1/registration/register
@@ -115,7 +163,8 @@ POST /api/v1/registration/register
   "firstName": "John",
   "lastName": "Doe",
   "adults": 2,
-  "kids": 1
+  "kids": 1,
+  "seniors": 0
 }
 ```
 
@@ -126,6 +175,9 @@ POST /api/v1/registration/register
 | `lastName`  | `string` | Required, 1–50 chars                    |
 | `adults`    | `number` | Integer, min: 0, max: 10               |
 | `kids`      | `number` | Integer, min: 0, max: 10               |
+| `seniors`   | `number` | Integer, min: 0, max: 10 (default: 0)  |
+
+> **Upsert behaviour:** If the email already exists in the database, the BE updates `firstName`, `lastName`, `adults`, `kids`, and `seniors` on the existing record and returns it. The original `code` is preserved. **No 409 is returned.**
 
 **Success Response — `201 Created` — `RegistrationResponse`:**
 
@@ -139,6 +191,7 @@ POST /api/v1/registration/register
     "code": "482719",
     "adults": 2,
     "kids": 1,
+    "seniors": 0,
     "status": "pending",
     "checkedInAt": null,
     "checkedInBy": null,
@@ -152,16 +205,7 @@ POST /api/v1/registration/register
 
 | Status | Error Code          | When                              |
 |--------|---------------------|-----------------------------------|
-| `400`  | `VALIDATION_ERROR`  | Missing/invalid fields            |
-| `409`  | `ALREADY_REGISTERED`| Email already has a registration  |
-
-```json
-{
-  "error": "ALREADY_REGISTERED",
-  "message": "This email is already registered for Family Day 2026",
-  "existingCode": "482719"
-}
-```
+| `422`  | `VALIDATION_ERROR`  | Missing/invalid fields            |
 
 ---
 
@@ -191,6 +235,7 @@ GET /api/v1/checkin/lookup/:code
     "code": "482719",
     "adults": 2,
     "kids": 1,
+    "seniors": 0,
     "status": "pending",
     "checkedInAt": null,
     "checkedInBy": null,
@@ -219,8 +264,10 @@ GET /api/v1/checkin/lookup/:code
 Confirm a guest's check-in at the event venue.
 
 ```
-POST /api/v1/checkin/confirm
+POST /api/v1/checkin
 ```
+
+> ⚠️ Note: The path is `/api/v1/checkin` (no `/confirm` suffix).
 
 **Request Body — `CheckInPayload`:**
 
@@ -229,6 +276,7 @@ POST /api/v1/checkin/confirm
   "guestId": "550e8400-e29b-41d4-a716-446655440000",
   "adults": 2,
   "kids": 1,
+  "seniors": 0,
   "method": "qr_scan"
 }
 ```
@@ -238,6 +286,7 @@ POST /api/v1/checkin/confirm
 | `guestId` | `string (UUID)` | Must exist in DB                               |
 | `adults`  | `number`        | Integer, min: 0 (can be edited at check-in)    |
 | `kids`    | `number`        | Integer, min: 0 (can be edited at check-in)    |
+| `seniors` | `number`        | Integer, min: 0 (can be edited at check-in)    |
 | `method`  | `CheckInMethod` | `"qr_scan"` \| `"manual_code"` \| `"manual_search"` |
 
 **Success Response — `200 OK`:**
@@ -253,6 +302,7 @@ POST /api/v1/checkin/confirm
     "code": "482719",
     "adults": 2,
     "kids": 1,
+    "seniors": 0,
     "status": "checked_in",
     "checkedInAt": "2026-03-28T11:15:30.000Z",
     "checkedInBy": "qr_scan",
@@ -307,6 +357,7 @@ POST /api/v1/checkin/undo
     "code": "482719",
     "adults": 2,
     "kids": 1,
+    "seniors": 0,
     "status": "pending",
     "checkedInAt": null,
     "checkedInBy": null,
@@ -377,6 +428,7 @@ GET /api/v1/checkin/guests?q={query}&filter={filter}&page={page}&limit={limit}
       "code": "482719",
       "adults": 2,
       "kids": 1,
+      "seniors": 0,
       "status": "pending",
       "checkedInAt": null,
       "checkedInBy": null,
@@ -398,17 +450,20 @@ GET /api/v1/checkin/guests?q={query}&filter={filter}&page={page}&limit={limit}
 
 ## Error Handling
 
-All error responses follow this shape:
+All error responses follow this base shape:
 
 ```json
 {
   "error": "ERROR_CODE",
-  "message": "Human-readable description",
-  "details": {}
+  "message": "Human-readable description"
 }
 ```
 
+> **Note:** Additional context fields are **flattened into the top-level** response body (not nested under a `details` key). For example, `ALREADY_CHECKED_IN` adds `checkedInAt` at the top level.
+
 ### Validation Error (422):
+
+Returned by FastAPI/Pydantic when request body fields fail validation.
 
 ```json
 {
@@ -428,12 +483,21 @@ All error responses follow this shape:
 | Code  | Meaning              | Used For                               |
 |-------|----------------------|----------------------------------------|
 | `200` | OK                   | Successful reads and updates           |
-| `201` | Created              | Successful registration                |
-| `400` | Bad Request          | Invalid data or invalid state change   |
+| `201` | Created              | Successful registration (new or upsert)|
+| `400` | Bad Request          | Invalid state change (e.g. undo when not checked in) |
 | `404` | Not Found            | Guest/code not found                   |
-| `409` | Conflict             | Already registered / already checked in|
+| `409` | Conflict             | Already checked in                     |
 | `422` | Unprocessable Entity | Field validation failures              |
 | `500` | Internal Server Error| Unexpected server errors               |
+
+---
+
+## Authentication
+
+All **check-in endpoints** (`/api/v1/checkin/*`) are protected via the `Authorization` header using `Depends(get_current_user)` middleware.
+
+- **Registration endpoints** (`/api/v1/registration/*`) are **public** — no auth required.
+- The auth middleware is currently a **no-op stub** (returns a hardcoded placeholder user). It will be replaced with Deloitte SSO / internal auth token validation before production.
 
 ---
 
@@ -441,14 +505,16 @@ All error responses follow this shape:
 
 | Concept | Detail |
 |---------|--------|
-| **Auth** | TBD — likely Deloitte SSO / internal auth token |
+| **Auth** | Check-in routes require auth header (currently stub). Registration routes are public. |
 | **Cache invalidation** | FE invalidates `['guests']` and `['stats']` query keys on every check-in and undo |
 | **QR Code content** | The 6-digit `code` string is encoded into the QR. BE returns it in `RegistrationResponse.code` |
 | **Undo window** | FE auto-dismisses after 3 seconds. Undo call can happen within that window |
 | **Check-in method tracking** | `method` field in `CheckInPayload` tracks how the guest was checked in (QR scan vs manual code vs search) |
-| **Family count editing** | Adults/kids can be modified at check-in time. The updated counts are sent in `CheckInPayload` |
+| **Family count editing** | Adults/kids/seniors can be modified at check-in time. The updated counts are sent in `CheckInPayload` |
 | **Real-time stats** | Progress bar shows `checkedIn/total` ratio. FE re-fetches on every mutation |
+| **Registration upsert** | Re-registering the same email updates the existing record (name, adults, kids, seniors). The original code is preserved. No 409 error. |
+| **Verify-email guest** | When `registered: true`, the verify-email response includes the full guest object so the FE can skip to the confirmation screen |
 
 ---
 
-*Generated from the Family Day 2026 architecture spec. For wireframes, see `/design/wireframes/`.*
+*Updated March 6, 2026 — synced with backend implementation. For wireframes, see `/design/wireframes/`.*
