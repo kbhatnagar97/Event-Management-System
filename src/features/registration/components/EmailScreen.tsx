@@ -29,6 +29,8 @@ export function EmailScreen() {
       {/* Brand */}
       <div className="brand">
         <img src="/hashedin-logo.svg" alt="HashedIn by Deloitte" className="brand__logo" />
+        <span className="brand__divider" />
+        <img src="/hi-engage-logo.svg" alt="Hi Engage" className="brand__logo brand__logo--hi" />
       </div>
 
       {/* Hero */}

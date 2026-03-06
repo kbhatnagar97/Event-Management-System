@@ -33,7 +33,11 @@ export function PinScreen() {
   return (
     <section className="pin-layout">
       <div className="pin-content">
-        <img src="/hashedin-logo.svg" alt="HashedIn by Deloitte" className="pin-logo" />
+        <div className="pin-brand">
+          <img src="/hashedin-logo.svg" alt="HashedIn by Deloitte" className="pin-logo" />
+          <span className="pin-brand__divider" />
+          <img src="/hi-engage-logo.svg" alt="Hi Engage" className="pin-logo pin-logo--hi" />
+        </div>
         <div className="pin-titles">
           <span className="pin-event">Family Day</span>
           <span className="pin-year">2026</span>

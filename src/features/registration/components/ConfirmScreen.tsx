@@ -31,6 +31,8 @@ export function ConfirmScreen() {
       {/* Brand */}
       <div className="brand brand--sm">
         <img src="/hashedin-logo.svg" alt="HashedIn by Deloitte" className="brand__logo" />
+        <span className="brand__divider" />
+        <img src="/hi-engage-logo.svg" alt="Hi Engage" className="brand__logo brand__logo--hi" />
       </div>
 
       {/* Animated checkmark */}
@@ -49,7 +51,7 @@ export function ConfirmScreen() {
         <span className="code-label">Your Registration Code</span>
         <span className="code-value">{store.registrationCode ?? '------'}</span>
         <div className="qr-wrapper">
-          <canvas ref={canvasRef} width={100} height={100} />
+          <canvas ref={canvasRef} width={220} height={220} />
         </div>
         <span className="code-hint">Scan this QR at the venue for quick check-in</span>
       </div>

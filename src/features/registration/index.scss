@@ -97,7 +97,9 @@
 /* Brand header */
 .brand {
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 14px;
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border);
@@ -119,13 +121,29 @@
 .brand--sm {
   margin-bottom: 16px;
   padding-bottom: 14px;
+  gap: 10px;
 
   .brand__logo { height: 24px; }
+  .brand__logo--hi { height: 32px; }
+  .brand__divider { height: 20px; }
 }
 
 .brand__logo {
   height: 30px;
   width: auto;
+}
+
+.brand__logo--hi {
+  height: 40px;
+}
+
+.brand__divider {
+  display: block;
+  width: 2px;
+  height: 26px;
+  background: var(--border);
+  flex-shrink: 0;
+  opacity: 0.85;
 }
 
 /* Hero */
