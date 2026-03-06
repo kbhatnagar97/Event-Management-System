@@ -1,0 +1,38 @@
+.animated-icon {
+  margin: 4px auto 14px;
+
+  &__svg { width: 100%; height: 100%; }
+
+  &__ring {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    animation: ringDraw 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+
+    &--success { stroke: var(--orange); }
+    &--error   { stroke: #ef4444; }
+    &--warning { stroke: #f59e0b; }
+  }
+
+  &__tick {
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    stroke-width: 3;
+    stroke: var(--orange);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: tickDraw 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+  }
+
+  &__cross {
+    stroke-dasharray: 56;
+    stroke-dashoffset: 56;
+    stroke-width: 3;
+    stroke: #ef4444;
+    stroke-linecap: round;
+    animation: tickDraw 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+  }
+}
+
+@keyframes ringDraw { to { stroke-dashoffset: 0; } }
+@keyframes tickDraw { to { stroke-dashoffset: 0; } }

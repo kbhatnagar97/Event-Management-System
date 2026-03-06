@@ -1,0 +1,1985 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Family Day 2026 – React Architecture</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ══════════════════════════════════════════
+         ARCHITECTURE DOC – INTERNAL STYLES
+         ══════════════════════════════════════════ */
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0f1117;
+        --surface: #1a1d27;
+        --surface-2: #22252f;
+        --border: rgba(255, 255, 255, 0.06);
+        --border-active: rgba(255, 107, 53, 0.4);
+        --text: rgba(255, 255, 255, 0.92);
+        --text-secondary: rgba(255, 255, 255, 0.55);
+        --text-muted: rgba(255, 255, 255, 0.3);
+        --orange: #ff6b35;
+        --orange-dim: rgba(255, 107, 53, 0.15);
+        --green: #22c55e;
+        --green-dim: rgba(34, 197, 94, 0.12);
+        --blue: #3b82f6;
+        --blue-dim: rgba(59, 130, 246, 0.12);
+        --purple: #a855f7;
+        --purple-dim: rgba(168, 85, 247, 0.12);
+        --amber: #f59e0b;
+        --amber-dim: rgba(245, 158, 11, 0.12);
+        --cyan: #06b6d4;
+        --cyan-dim: rgba(6, 182, 212, 0.12);
+        --pink: #ec4899;
+        --pink-dim: rgba(236, 72, 153, 0.12);
+        --red: #ef4444;
+        --red-dim: rgba(239, 68, 68, 0.12);
+        --radius: 14px;
+        --radius-sm: 8px;
+        --radius-lg: 20px;
+        --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        --mono: 'JetBrains Mono', 'Fira Code', monospace;
+      }
+
+      body {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.6;
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        text-align: center;
+        padding: 60px 24px 32px;
+        position: relative;
+      }
+      .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 300px;
+        background: radial-gradient(
+          ellipse,
+          rgba(255, 107, 53, 0.08),
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .header-titles {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 6px;
+      }
+      .header-event {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 700;
+      }
+      .header-year {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--orange);
+      }
+      .header-sub {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        margin-bottom: 24px;
+      }
+      .tech-pills {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+      }
+      .tech-pill {
+        padding: 6px 14px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .tech-pill .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+
+      /* ── Tab Navigation ── */
+      .tab-nav {
+        display: flex;
+        overflow-x: auto;
+        gap: 4px;
+        padding: 0 24px 2px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .tab-nav::-webkit-scrollbar {
+        display: none;
+      }
+      .tab-btn {
+        flex-shrink: 0;
+        padding: 12px 18px;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .tab-btn:hover {
+        color: var(--text-secondary);
+      }
+      .tab-btn.active {
+        color: var(--orange);
+        border-bottom-color: var(--orange);
+      }
+
+      /* ── Tab Panels ── */
+      .tab-panel {
+        display: none;
+        padding: 0 24px 48px;
+        max-width: 1000px;
+        margin: 0 auto;
+        animation: panelFade 0.3s ease;
+      }
+      .tab-panel.active {
+        display: block;
+      }
+      @keyframes panelFade {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ── Section Headers ── */
+      .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .section-desc {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--border);
+      }
+      .code-filename {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .code-filename .file-icon {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.6rem;
+        font-weight: 700;
+      }
+      .code-lang {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background: var(--orange-dim);
+        color: var(--orange);
+      }
+      .code-body {
+        padding: 16px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .code-body pre {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        line-height: 1.7;
+        color: var(--text);
+        white-space: pre;
+        margin: 0;
+      }
+      /* Syntax colors */
+      .k {
+        color: var(--purple);
+      } /* keyword */
+      .t {
+        color: var(--cyan);
+      } /* type */
+      .f {
+        color: var(--blue);
+      } /* function */
+      .s {
+        color: var(--green);
+      } /* string */
+      .c {
+        color: var(--text-muted);
+        font-style: italic;
+      } /* comment */
+      .n {
+        color: var(--amber);
+      } /* number */
+      .o {
+        color: var(--orange);
+      } /* operator/special */
+      .p {
+        color: var(--pink);
+      } /* property */
+
+      /* ── Tree View ── */
+      .tree {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 16px;
+        margin-bottom: 20px;
+      }
+      .tree-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 5px 0;
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        color: var(--text);
+      }
+      .tree-item.folder {
+        color: var(--orange);
+        font-weight: 600;
+      }
+      .tree-item.file {
+        color: var(--text-secondary);
+      }
+      .tree-indent {
+        display: inline-block;
+        width: 20px;
+        flex-shrink: 0;
+        color: var(--text-muted);
+        text-align: center;
+        user-select: none;
+      }
+      .tree-icon {
+        flex-shrink: 0;
+        width: 16px;
+        text-align: center;
+        font-size: 0.7rem;
+      }
+      .tree-name {
+        flex: 1;
+      }
+      .tree-desc {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.72rem;
+        font-weight: 400;
+        color: var(--text-muted);
+        margin-left: 8px;
+      }
+
+      /* ── Component Cards ── */
+      .comp-grid {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .comp-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        transition: border-color 0.2s;
+      }
+      .comp-card:hover {
+        border-color: var(--border-active);
+      }
+      .comp-route {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        padding: 3px 10px;
+        background: var(--orange-dim);
+        color: var(--orange);
+        border-radius: 100px;
+        display: inline-block;
+        margin-bottom: 10px;
+      }
+      .comp-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .comp-desc {
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        margin-bottom: 14px;
+      }
+      .comp-tree {
+        padding: 0;
+      }
+      .comp-tree .ct-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 0;
+        font-size: 0.82rem;
+      }
+      .ct-indent {
+        display: inline-flex;
+        gap: 0;
+      }
+      .ct-spacer {
+        width: 20px;
+        display: inline-block;
+      }
+      .ct-icon {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .ct-name {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+      .ct-tag {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.68rem;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      /* ── Store Cards ── */
+      .store-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .store-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .store-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .store-name {
+        font-family: var(--mono);
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+      .store-badge {
+        margin-left: auto;
+        font-size: 0.7rem;
+        padding: 3px 10px;
+        border-radius: 100px;
+        font-weight: 500;
+      }
+      .store-section-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        margin-top: 12px;
+      }
+      .store-props {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .store-prop {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        padding: 6px 10px;
+        background: var(--surface-2);
+        border-radius: 6px;
+        font-family: var(--mono);
+        font-size: 0.78rem;
+      }
+      .prop-name {
+        color: var(--text);
+        font-weight: 500;
+      }
+      .prop-type {
+        color: var(--cyan);
+        font-size: 0.72rem;
+      }
+      .prop-default {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        margin-left: auto;
+      }
+
+      /* ── Flow Diagrams ── */
+      .flow-section {
+        margin-bottom: 32px;
+      }
+      .flow-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .flow-desc {
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        margin-bottom: 14px;
+      }
+      .flow-diagram {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        padding: 16px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .flow-node {
+        flex-shrink: 0;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+        border: 1px solid;
+      }
+      .flow-arrow {
+        flex-shrink: 0;
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        padding: 0 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .flow-arrow::after {
+        content: '→';
+        font-size: 1rem;
+      }
+      .flow-label {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        color: var(--text-muted);
+      }
+
+      /* ── Type Cards ── */
+      .type-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      .type-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 16px;
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--border);
+      }
+      .type-keyword {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+      }
+      .type-name {
+        font-family: var(--mono);
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      .type-body {
+        padding: 12px 16px;
+      }
+      .type-row {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-family: var(--mono);
+        font-size: 0.78rem;
+      }
+      .type-row:hover {
+        background: var(--surface-2);
+      }
+      .type-field {
+        color: var(--text);
+        font-weight: 500;
+        min-width: 100px;
+      }
+      .type-field-type {
+        color: var(--cyan);
+      }
+      .type-optional {
+        color: var(--text-muted);
+        font-size: 0.7rem;
+      }
+
+      /* ── Responsive ── */
+      @media (min-width: 700px) {
+        .comp-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 600px) {
+        .page-header {
+          padding: 40px 16px 24px;
+        }
+        .header-event {
+          font-size: 1.6rem;
+        }
+        .tab-nav {
+          padding: 0 16px;
+        }
+        .tab-panel {
+          padding: 0 16px 36px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════ Page Header ═══════ -->
+    <header class="page-header">
+      <div class="header-titles">
+        <span class="header-event">Family Day</span>
+        <span class="header-year">2026</span>
+      </div>
+      <p class="header-sub">React Application Architecture</p>
+      <div class="tech-pills">
+        <span class="tech-pill"
+          ><span class="dot" style="background: #61dafb"></span>React 18</span
+        >
+        <span class="tech-pill"
+          ><span class="dot" style="background: #3178c6"></span
+          >TypeScript</span
+        >
+        <span class="tech-pill"
+          ><span class="dot" style="background: var(--orange)"></span
+          >Zustand</span
+        >
+        <span class="tech-pill"
+          ><span class="dot" style="background: var(--red)"></span>TanStack
+          Query v5</span
+        >
+        <span class="tech-pill"
+          ><span class="dot" style="background: var(--pink)"></span>SCSS</span
+        >
+        <span class="tech-pill"
+          ><span class="dot" style="background: var(--amber)"></span>Vite</span
+        >
+        <span class="tech-pill"
+          ><span class="dot" style="background: var(--purple)"></span>React
+          Router v6</span
+        >
+      </div>
+    </header>
+
+    <!-- ═══════ Tab Navigation ═══════ -->
+    <nav class="tab-nav" id="tabNav">
+      <button class="tab-btn active" onclick="showTab('folder')">
+        📁 Folder Structure
+      </button>
+      <button class="tab-btn" onclick="showTab('components')">
+        🧩 Component Tree
+      </button>
+      <button class="tab-btn" onclick="showTab('stores')">
+        🏪 Zustand Stores
+      </button>
+      <button class="tab-btn" onclick="showTab('types')">
+        📐 Types
+      </button>
+      <button class="tab-btn" onclick="showTab('flow')">
+        🔄 Data Flow
+      </button>
+      <button class="tab-btn" onclick="showTab('code')">
+        💻 Code Samples
+      </button>
+    </nav>
+
+    <!-- ═══════════════════════════════════
+         TAB 1: FOLDER STRUCTURE
+         ═══════════════════════════════════ -->
+    <div class="tab-panel active" id="panel-folder">
+      <h2 class="section-title">Project Structure</h2>
+      <p class="section-desc">
+        Feature-based folder organization with shared components and utilities
+      </p>
+
+      <div class="tree">
+        <div class="tree-item folder">
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">src/</span>
+        </div>
+
+        <!-- app/ -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">app/</span>
+          <span class="tree-desc">App shell & routing</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">⚛</span>
+          <span class="tree-name">App.tsx</span>
+          <span class="tree-desc">Root component + providers</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">⚛</span>
+          <span class="tree-name">main.tsx</span>
+          <span class="tree-desc">Entry point</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">🛣</span>
+          <span class="tree-name">routes.tsx</span>
+          <span class="tree-desc">Route definitions</span>
+        </div>
+
+        <!-- features/ -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">features/</span>
+          <span class="tree-desc">Feature modules</span>
+        </div>
+
+        <!-- features/registration -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">registration/</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">⚛</span>
+          <span class="tree-name">index.tsx</span>
+          <span class="tree-desc">RegistrationPage entry</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🎨</span>
+          <span class="tree-name">index.scss</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">components/</span>
+          <span class="tree-desc">EmailScreen, FormScreen, ConfirmScreen, EventInfo, FamilyCounters, QRCodeDisplay, RegistrationSummary, CountdownTimer</span>
+        </div>
+
+        <!-- features/checkin -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">checkin/</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">⚛</span>
+          <span class="tree-name">index.tsx</span>
+          <span class="tree-desc">CheckInPage entry</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🎨</span>
+          <span class="tree-name">index.scss</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">components/</span>
+          <span class="tree-desc">PinScreen, ScannerScreen, SearchScreen, Viewfinder, BottomPanel, CodeEntrySheet, SuccessOverlay, DuplicateOverlay, NotFoundOverlay, GuestCard, SearchConfirmModal, SearchUndoModal</span>
+        </div>
+
+        <!-- hooks/ -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">hooks/</span>
+          <span class="tree-desc">Custom React hooks</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🪝</span>
+          <span class="tree-name">useRegistration.ts</span>
+          <span class="tree-desc">Registration mutations</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🪝</span>
+          <span class="tree-name">useCheckIn.ts</span>
+          <span class="tree-desc">Check-in mutations</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🪝</span>
+          <span class="tree-name">useGuestSearch.ts</span>
+          <span class="tree-desc">Guest search query</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🪝</span>
+          <span class="tree-name">useQRScanner.ts</span>
+          <span class="tree-desc">Camera & scanning</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">🪝</span>
+          <span class="tree-name">useCountdown.ts</span>
+          <span class="tree-desc">Event countdown timer</span>
+        </div>
+
+        <!-- stores/ -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">stores/</span>
+          <span class="tree-desc">Zustand state management</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🏪</span>
+          <span class="tree-name">useAuthStore.ts</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🏪</span>
+          <span class="tree-name">useRegistrationStore.ts</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🏪</span>
+          <span class="tree-name">useCheckInStore.ts</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">🏪</span>
+          <span class="tree-name">useUIStore.ts</span>
+        </div>
+
+        <!-- api/ -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">api/</span>
+          <span class="tree-desc">API client & endpoints</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🌐</span>
+          <span class="tree-name">client.ts</span>
+          <span class="tree-desc">Axios/fetch wrapper</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🌐</span>
+          <span class="tree-name">registration.ts</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">🌐</span>
+          <span class="tree-name">checkin.ts</span>
+        </div>
+
+        <!-- types/ -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">types/</span>
+          <span class="tree-desc">TypeScript definitions</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📐</span>
+          <span class="tree-name">registration.ts</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📐</span>
+          <span class="tree-name">checkin.ts</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">📐</span>
+          <span class="tree-name">common.ts</span>
+          <span class="tree-desc">Guest, GuestStatus, shared types</span>
+        </div>
+
+        <!-- components/ -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">components/</span>
+          <span class="tree-desc">Shared UI components</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">Button/</span>
+          <span class="tree-desc">index.tsx + index.scss</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">Input/</span>
+          <span class="tree-desc">index.tsx + index.scss</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">Counter/</span>
+          <span class="tree-desc">index.tsx + index.scss</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">Overlay/</span>
+          <span class="tree-desc">index.tsx + index.scss</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">BottomSheet/</span>
+          <span class="tree-desc">index.tsx + index.scss</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">AnimatedIcon/</span>
+          <span class="tree-desc">index.tsx + index.scss</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">ProgressBar/</span>
+          <span class="tree-desc">index.tsx + index.scss</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">PinKeypad/</span>
+          <span class="tree-desc">index.tsx + index.scss</span>
+        </div>
+
+        <!-- styles/ -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">styles/</span>
+          <span class="tree-desc">Global styles & variables</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🎨</span>
+          <span class="tree-name">_variables.scss</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">🎨</span>
+          <span class="tree-name">_mixins.scss</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">🎨</span>
+          <span class="tree-name">global.scss</span>
+        </div>
+
+        <!-- assets/ & lib/ -->
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">assets/</span>
+          <span class="tree-desc">Static assets</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">🖼</span>
+          <span class="tree-name">hashedin-logo.svg</span>
+        </div>
+        <div class="tree-item folder">
+          <span class="tree-indent">│</span>
+          <span class="tree-icon">📁</span>
+          <span class="tree-name">lib/</span>
+          <span class="tree-desc">Utility functions</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📄</span>
+          <span class="tree-name">helpers.ts</span>
+          <span class="tree-desc">Shared utility functions</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">├</span>
+          <span class="tree-icon">📄</span>
+          <span class="tree-name">qr.ts</span>
+          <span class="tree-desc">QR code utilities</span>
+        </div>
+        <div class="tree-item file">
+          <span class="tree-indent">│</span>
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">📄</span>
+          <span class="tree-name">constants.ts</span>
+          <span class="tree-desc">App-wide constants</span>
+        </div>
+
+        <!-- Root files -->
+        <div class="tree-item file">
+          <span class="tree-indent">└</span>
+          <span class="tree-icon">📐</span>
+          <span class="tree-name">vite-env.d.ts</span>
+          <span class="tree-desc">Vite type declarations</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 2: COMPONENT TREE
+         ═══════════════════════════════════ -->
+    <div class="tab-panel" id="panel-components">
+      <h2 class="section-title">Component Architecture</h2>
+      <p class="section-desc">
+        Feature-based component hierarchy with shared UI primitives
+      </p>
+
+      <div class="comp-grid">
+        <!-- Registration -->
+        <div class="comp-card">
+          <span class="comp-route">/ (Registration)</span>
+          <h3 class="comp-name">RegistrationPage</h3>
+          <p class="comp-desc">
+            3-step registration wizard with animated transitions
+          </p>
+          <div class="comp-tree">
+            <div class="ct-item">
+              <span class="ct-icon" style="background: var(--blue-dim); color: var(--blue)">P</span>
+              <span class="ct-name">RegistrationPage</span>
+              <span class="ct-tag" style="background: var(--blue-dim); color: var(--blue)">Page</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--green-dim); color: var(--green)">S</span>
+              <span class="ct-name">EmailScreen</span>
+              <span class="ct-tag" style="background: var(--green-dim); color: var(--green)">Screen</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--purple-dim); color: var(--purple)">C</span>
+              <span class="ct-name">EventInfo</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--green-dim); color: var(--green)">S</span>
+              <span class="ct-name">FormScreen</span>
+              <span class="ct-tag" style="background: var(--green-dim); color: var(--green)">Screen</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--purple-dim); color: var(--purple)">C</span>
+              <span class="ct-name">FamilyCounters</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"><span class="ct-spacer"></span></span></span>
+              <span class="ct-icon" style="background: var(--orange-dim); color: var(--orange)">U</span>
+              <span class="ct-name">Counter</span>
+              <span class="ct-tag" style="background: var(--orange-dim); color: var(--orange)">Shared</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--green-dim); color: var(--green)">S</span>
+              <span class="ct-name">ConfirmScreen</span>
+              <span class="ct-tag" style="background: var(--green-dim); color: var(--green)">Screen</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--orange-dim); color: var(--orange)">U</span>
+              <span class="ct-name">AnimatedIcon</span>
+              <span class="ct-tag" style="background: var(--orange-dim); color: var(--orange)">Shared</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--purple-dim); color: var(--purple)">C</span>
+              <span class="ct-name">QRCodeDisplay</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--purple-dim); color: var(--purple)">C</span>
+              <span class="ct-name">RegistrationSummary</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--purple-dim); color: var(--purple)">C</span>
+              <span class="ct-name">CountdownTimer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Check-In -->
+        <div class="comp-card">
+          <span class="comp-route">/checkin</span>
+          <h3 class="comp-name">CheckInPage</h3>
+          <p class="comp-desc">
+            Staff-facing check-in with QR scanner, code entry & manual search
+          </p>
+          <div class="comp-tree">
+            <div class="ct-item">
+              <span class="ct-icon" style="background: var(--blue-dim); color: var(--blue)">P</span>
+              <span class="ct-name">CheckInPage</span>
+              <span class="ct-tag" style="background: var(--blue-dim); color: var(--blue)">Page</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--green-dim); color: var(--green)">S</span>
+              <span class="ct-name">PinScreen</span>
+              <span class="ct-tag" style="background: var(--green-dim); color: var(--green)">Screen</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--orange-dim); color: var(--orange)">U</span>
+              <span class="ct-name">PinKeypad</span>
+              <span class="ct-tag" style="background: var(--orange-dim); color: var(--orange)">Shared</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--green-dim); color: var(--green)">S</span>
+              <span class="ct-name">ScannerScreen</span>
+              <span class="ct-tag" style="background: var(--green-dim); color: var(--green)">Screen</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--purple-dim); color: var(--purple)">C</span>
+              <span class="ct-name">Viewfinder</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--purple-dim); color: var(--purple)">C</span>
+              <span class="ct-name">BottomPanel</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--purple-dim); color: var(--purple)">C</span>
+              <span class="ct-name">CodeEntrySheet</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--amber-dim); color: var(--amber)">O</span>
+              <span class="ct-name">SuccessOverlay</span>
+              <span class="ct-tag" style="background: var(--amber-dim); color: var(--amber)">Overlay</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--amber-dim); color: var(--amber)">O</span>
+              <span class="ct-name">DuplicateOverlay</span>
+              <span class="ct-tag" style="background: var(--amber-dim); color: var(--amber)">Overlay</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--amber-dim); color: var(--amber)">O</span>
+              <span class="ct-name">NotFoundOverlay</span>
+              <span class="ct-tag" style="background: var(--amber-dim); color: var(--amber)">Overlay</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--green-dim); color: var(--green)">S</span>
+              <span class="ct-name">SearchScreen</span>
+              <span class="ct-tag" style="background: var(--green-dim); color: var(--green)">Screen</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--purple-dim); color: var(--purple)">C</span>
+              <span class="ct-name">GuestCard</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--amber-dim); color: var(--amber)">O</span>
+              <span class="ct-name">SearchConfirmModal</span>
+            </div>
+            <div class="ct-item">
+              <span class="ct-indent"><span class="ct-spacer"></span><span class="ct-spacer"></span></span>
+              <span class="ct-icon" style="background: var(--amber-dim); color: var(--amber)">O</span>
+              <span class="ct-name">SearchUndoModal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 3: ZUSTAND STORES
+         ═══════════════════════════════════ -->
+    <div class="tab-panel" id="panel-stores">
+      <h2 class="section-title">State Management</h2>
+      <p class="section-desc">
+        Zustand stores for client-side state. Server state handled by TanStack
+        Query.
+      </p>
+
+      <!-- useAuthStore -->
+      <div class="store-card">
+        <div class="store-header">
+          <div class="store-icon" style="background: var(--red-dim); color: var(--red)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </div>
+          <span class="store-name">useAuthStore</span>
+          <span class="store-badge" style="background: var(--red-dim); color: var(--red)">Auth</span>
+        </div>
+        <span class="store-section-label">State</span>
+        <div class="store-props">
+          <div class="store-prop">
+            <span class="prop-name">isAuthenticated</span>
+            <span class="prop-type">boolean</span>
+            <span class="prop-default">false</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">pin</span>
+            <span class="prop-type">string</span>
+            <span class="prop-default">''</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">error</span>
+            <span class="prop-type">boolean</span>
+            <span class="prop-default">false</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">attempts</span>
+            <span class="prop-type">number</span>
+            <span class="prop-default">0</span>
+          </div>
+        </div>
+        <span class="store-section-label">Actions</span>
+        <div class="store-props">
+          <div class="store-prop">
+            <span class="prop-name">appendDigit</span>
+            <span class="prop-type">(d: string) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">deleteDigit</span>
+            <span class="prop-type">() → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">verifyPin</span>
+            <span class="prop-type">() → boolean</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">reset</span>
+            <span class="prop-type">() → void</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- useRegistrationStore -->
+      <div class="store-card">
+        <div class="store-header">
+          <div class="store-icon" style="background: var(--green-dim); color: var(--green)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="8.5" cy="7" r="4" />
+              <line x1="20" y1="8" x2="20" y2="14" />
+              <line x1="23" y1="11" x2="17" y2="11" />
+            </svg>
+          </div>
+          <span class="store-name">useRegistrationStore</span>
+          <span class="store-badge" style="background: var(--green-dim); color: var(--green)">Registration</span>
+        </div>
+        <span class="store-section-label">State</span>
+        <div class="store-props">
+          <div class="store-prop">
+            <span class="prop-name">step</span>
+            <span class="prop-type">1 | 2 | 3</span>
+            <span class="prop-default">1</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">email</span>
+            <span class="prop-type">string</span>
+            <span class="prop-default">''</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">firstName</span>
+            <span class="prop-type">string</span>
+            <span class="prop-default">''</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">lastName</span>
+            <span class="prop-type">string</span>
+            <span class="prop-default">''</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">adults</span>
+            <span class="prop-type">number</span>
+            <span class="prop-default">0</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">kids</span>
+            <span class="prop-type">number</span>
+            <span class="prop-default">0</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">consent</span>
+            <span class="prop-type">boolean</span>
+            <span class="prop-default">false</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">registrationCode</span>
+            <span class="prop-type">string | null</span>
+            <span class="prop-default">null</span>
+          </div>
+        </div>
+        <span class="store-section-label">Actions</span>
+        <div class="store-props">
+          <div class="store-prop">
+            <span class="prop-name">setEmail</span>
+            <span class="prop-type">(email: string) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">setStep</span>
+            <span class="prop-type">(step: 1|2|3) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">updateField</span>
+            <span class="prop-type">(field, value) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">updateCounter</span>
+            <span class="prop-type">(type, delta) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">setConsent</span>
+            <span class="prop-type">(v: boolean) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">setRegistrationCode</span>
+            <span class="prop-type">(code: string) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">reset</span>
+            <span class="prop-type">() → void</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- useCheckInStore -->
+      <div class="store-card">
+        <div class="store-header">
+          <div class="store-icon" style="background: var(--orange-dim); color: var(--orange)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 11 12 14 22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg>
+          </div>
+          <span class="store-name">useCheckInStore</span>
+          <span class="store-badge" style="background: var(--orange-dim); color: var(--orange)">Check-In</span>
+        </div>
+        <span class="store-section-label">State</span>
+        <div class="store-props">
+          <div class="store-prop">
+            <span class="prop-name">screen</span>
+            <span class="prop-type">'pin' | 'scanner' | 'search'</span>
+            <span class="prop-default">'pin'</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">overlay</span>
+            <span class="prop-type">OverlayType | null</span>
+            <span class="prop-default">null</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">overlayStep</span>
+            <span class="prop-type">1 | 2</span>
+            <span class="prop-default">1</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">currentGuest</span>
+            <span class="prop-type">Guest | null</span>
+            <span class="prop-default">null</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">editAdults</span>
+            <span class="prop-type">number</span>
+            <span class="prop-default">0</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">editKids</span>
+            <span class="prop-type">number</span>
+            <span class="prop-default">0</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">searchQuery</span>
+            <span class="prop-type">string</span>
+            <span class="prop-default">''</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">searchFilter</span>
+            <span class="prop-type">'all' | 'pending' | 'checked_in'</span>
+            <span class="prop-default">'all'</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">codeEntryOpen</span>
+            <span class="prop-type">boolean</span>
+            <span class="prop-default">false</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">enteredCode</span>
+            <span class="prop-type">string</span>
+            <span class="prop-default">''</span>
+          </div>
+        </div>
+        <span class="store-section-label">Actions</span>
+        <div class="store-props">
+          <div class="store-prop">
+            <span class="prop-name">setScreen</span>
+            <span class="prop-type">(s) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">showOverlay</span>
+            <span class="prop-type">(type, guest) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">advanceOverlay</span>
+            <span class="prop-type">() → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">dismissOverlay</span>
+            <span class="prop-type">() → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">updateEditCounter</span>
+            <span class="prop-type">(type, delta) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">setSearchQuery</span>
+            <span class="prop-type">(q: string) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">setSearchFilter</span>
+            <span class="prop-type">(f) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">toggleCodeEntry</span>
+            <span class="prop-type">() → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">setEnteredCode</span>
+            <span class="prop-type">(c: string) → void</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- useUIStore -->
+      <div class="store-card">
+        <div class="store-header">
+          <div class="store-icon" style="background: var(--purple-dim); color: var(--purple)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="9" y1="3" x2="9" y2="21" />
+            </svg>
+          </div>
+          <span class="store-name">useUIStore</span>
+          <span class="store-badge" style="background: var(--purple-dim); color: var(--purple)">UI</span>
+        </div>
+        <span class="store-section-label">State</span>
+        <div class="store-props">
+          <div class="store-prop">
+            <span class="prop-name">direction</span>
+            <span class="prop-type">'forward' | 'back'</span>
+            <span class="prop-default">'forward'</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">toasts</span>
+            <span class="prop-type">Toast[]</span>
+            <span class="prop-default">[]</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">isOnline</span>
+            <span class="prop-type">boolean</span>
+            <span class="prop-default">true</span>
+          </div>
+        </div>
+        <span class="store-section-label">Actions</span>
+        <div class="store-props">
+          <div class="store-prop">
+            <span class="prop-name">setDirection</span>
+            <span class="prop-type">(d) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">showToast</span>
+            <span class="prop-type">(msg, type?) → void</span>
+          </div>
+          <div class="store-prop">
+            <span class="prop-name">dismissToast</span>
+            <span class="prop-type">(id) → void</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 4: TYPES
+         ═══════════════════════════════════ -->
+    <div class="tab-panel" id="panel-types">
+      <h2 class="section-title">TypeScript Types</h2>
+      <p class="section-desc">
+        Core data models and API contracts
+      </p>
+
+      <!-- Guest -->
+      <div class="type-card">
+        <div class="type-header">
+          <span class="type-keyword" style="background: var(--blue-dim); color: var(--blue)">interface</span>
+          <span class="type-name">Guest</span>
+        </div>
+        <div class="type-body">
+          <div class="type-row"><span class="type-field">id</span><span class="type-field-type">string</span></div>
+          <div class="type-row"><span class="type-field">firstName</span><span class="type-field-type">string</span></div>
+          <div class="type-row"><span class="type-field">lastName</span><span class="type-field-type">string</span></div>
+          <div class="type-row"><span class="type-field">email</span><span class="type-field-type">string</span></div>
+          <div class="type-row"><span class="type-field">code</span><span class="type-field-type">string</span></div>
+          <div class="type-row"><span class="type-field">adults</span><span class="type-field-type">number</span></div>
+          <div class="type-row"><span class="type-field">kids</span><span class="type-field-type">number</span></div>
+          <div class="type-row"><span class="type-field">status</span><span class="type-field-type">GuestStatus</span></div>
+          <div class="type-row"><span class="type-field">checkedInAt</span><span class="type-field-type">string</span><span class="type-optional">optional</span></div>
+          <div class="type-row"><span class="type-field">checkedInBy</span><span class="type-field-type">string</span><span class="type-optional">optional</span></div>
+        </div>
+      </div>
+
+      <!-- GuestStatus -->
+      <div class="type-card">
+        <div class="type-header">
+          <span class="type-keyword" style="background: var(--purple-dim); color: var(--purple)">enum</span>
+          <span class="type-name">GuestStatus</span>
+        </div>
+        <div class="type-body">
+          <div class="type-row"><span class="type-field">pending</span><span class="type-field-type">'pending'</span></div>
+          <div class="type-row"><span class="type-field">checked_in</span><span class="type-field-type">'checked_in'</span></div>
+          <div class="type-row"><span class="type-field">cancelled</span><span class="type-field-type">'cancelled'</span></div>
+        </div>
+      </div>
+
+      <!-- RegistrationPayload -->
+      <div class="type-card">
+        <div class="type-header">
+          <span class="type-keyword" style="background: var(--blue-dim); color: var(--blue)">interface</span>
+          <span class="type-name">RegistrationPayload</span>
+        </div>
+        <div class="type-body">
+          <div class="type-row"><span class="type-field">email</span><span class="type-field-type">string</span></div>
+          <div class="type-row"><span class="type-field">firstName</span><span class="type-field-type">string</span></div>
+          <div class="type-row"><span class="type-field">lastName</span><span class="type-field-type">string</span></div>
+          <div class="type-row"><span class="type-field">adults</span><span class="type-field-type">number</span></div>
+          <div class="type-row"><span class="type-field">kids</span><span class="type-field-type">number</span></div>
+        </div>
+      </div>
+
+      <!-- RegistrationResponse -->
+      <div class="type-card">
+        <div class="type-header">
+          <span class="type-keyword" style="background: var(--blue-dim); color: var(--blue)">interface</span>
+          <span class="type-name">RegistrationResponse</span>
+        </div>
+        <div class="type-body">
+          <div class="type-row"><span class="type-field">guest</span><span class="type-field-type">Guest</span></div>
+          <div class="type-row"><span class="type-field">code</span><span class="type-field-type">string</span></div>
+        </div>
+      </div>
+
+      <!-- CheckInPayload -->
+      <div class="type-card">
+        <div class="type-header">
+          <span class="type-keyword" style="background: var(--blue-dim); color: var(--blue)">interface</span>
+          <span class="type-name">CheckInPayload</span>
+        </div>
+        <div class="type-body">
+          <div class="type-row"><span class="type-field">guestId</span><span class="type-field-type">string</span></div>
+          <div class="type-row"><span class="type-field">adults</span><span class="type-field-type">number</span></div>
+          <div class="type-row"><span class="type-field">kids</span><span class="type-field-type">number</span></div>
+          <div class="type-row"><span class="type-field">method</span><span class="type-field-type">CheckInMethod</span></div>
+        </div>
+      </div>
+
+      <!-- CheckInMethod -->
+      <div class="type-card">
+        <div class="type-header">
+          <span class="type-keyword" style="background: var(--cyan-dim); color: var(--cyan)">type</span>
+          <span class="type-name">CheckInMethod</span>
+        </div>
+        <div class="type-body">
+          <div class="type-row"><span class="type-field-type">'qr_scan' | 'manual_code' | 'manual_search'</span></div>
+        </div>
+      </div>
+
+      <!-- OverlayType -->
+      <div class="type-card">
+        <div class="type-header">
+          <span class="type-keyword" style="background: var(--cyan-dim); color: var(--cyan)">type</span>
+          <span class="type-name">OverlayType</span>
+        </div>
+        <div class="type-body">
+          <div class="type-row"><span class="type-field-type">'success' | 'duplicate' | 'not_found'</span></div>
+        </div>
+      </div>
+
+      <!-- CheckInStats -->
+      <div class="type-card">
+        <div class="type-header">
+          <span class="type-keyword" style="background: var(--blue-dim); color: var(--blue)">interface</span>
+          <span class="type-name">CheckInStats</span>
+        </div>
+        <div class="type-body">
+          <div class="type-row"><span class="type-field">total</span><span class="type-field-type">number</span></div>
+          <div class="type-row"><span class="type-field">checkedIn</span><span class="type-field-type">number</span></div>
+          <div class="type-row"><span class="type-field">pending</span><span class="type-field-type">number</span></div>
+          <div class="type-row"><span class="type-field">percentage</span><span class="type-field-type">number</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 5: DATA FLOW
+         ═══════════════════════════════════ -->
+    <div class="tab-panel" id="panel-flow">
+      <h2 class="section-title">Data Flow</h2>
+      <p class="section-desc">
+        How data moves through the application for key user journeys
+      </p>
+
+      <!-- Registration Flow -->
+      <div class="flow-section">
+        <h3 class="flow-title">Registration Flow</h3>
+        <p class="flow-desc">Guest registers for the event</p>
+        <div class="flow-diagram">
+          <div class="flow-node" style="background: var(--green-dim); color: var(--green); border-color: rgba(34,197,94,0.2)">
+            EmailScreen
+          </div>
+          <div class="flow-arrow"><span class="flow-label">verify email</span></div>
+          <div class="flow-node" style="background: var(--blue-dim); color: var(--blue); border-color: rgba(59,130,246,0.2)">
+            API: verifyEmail
+          </div>
+          <div class="flow-arrow"><span class="flow-label">valid</span></div>
+          <div class="flow-node" style="background: var(--green-dim); color: var(--green); border-color: rgba(34,197,94,0.2)">
+            FormScreen
+          </div>
+          <div class="flow-arrow"><span class="flow-label">submit</span></div>
+          <div class="flow-node" style="background: var(--blue-dim); color: var(--blue); border-color: rgba(59,130,246,0.2)">
+            API: register
+          </div>
+          <div class="flow-arrow"><span class="flow-label">code</span></div>
+          <div class="flow-node" style="background: var(--green-dim); color: var(--green); border-color: rgba(34,197,94,0.2)">
+            ConfirmScreen
+          </div>
+          <div class="flow-arrow"><span class="flow-label">display</span></div>
+          <div class="flow-node" style="background: var(--purple-dim); color: var(--purple); border-color: rgba(168,85,247,0.2)">
+            QR Code
+          </div>
+        </div>
+      </div>
+
+      <!-- Check-in QR Scan Flow -->
+      <div class="flow-section">
+        <h3 class="flow-title">Check-In: QR Scan</h3>
+        <p class="flow-desc">Staff scans guest's QR code at the venue</p>
+        <div class="flow-diagram">
+          <div class="flow-node" style="background: var(--green-dim); color: var(--green); border-color: rgba(34,197,94,0.2)">
+            Camera Scan
+          </div>
+          <div class="flow-arrow"><span class="flow-label">decode</span></div>
+          <div class="flow-node" style="background: var(--blue-dim); color: var(--blue); border-color: rgba(59,130,246,0.2)">
+            API: lookupCode
+          </div>
+          <div class="flow-arrow"><span class="flow-label">guest</span></div>
+          <div class="flow-node" style="background: var(--amber-dim); color: var(--amber); border-color: rgba(245,158,11,0.2)">
+            SuccessOverlay
+          </div>
+          <div class="flow-arrow"><span class="flow-label">confirm</span></div>
+          <div class="flow-node" style="background: var(--blue-dim); color: var(--blue); border-color: rgba(59,130,246,0.2)">
+            API: checkIn
+          </div>
+          <div class="flow-arrow"><span class="flow-label">done</span></div>
+          <div class="flow-node" style="background: var(--green-dim); color: var(--green); border-color: rgba(34,197,94,0.2)">
+            Auto-dismiss 3s
+          </div>
+        </div>
+      </div>
+
+      <!-- Duplicate + Undo Flow -->
+      <div class="flow-section">
+        <h3 class="flow-title">Duplicate Scan + Undo</h3>
+        <p class="flow-desc">
+          Handling already-checked-in guests with undo capability
+        </p>
+        <div class="flow-diagram">
+          <div class="flow-node" style="background: var(--amber-dim); color: var(--amber); border-color: rgba(245,158,11,0.2)">
+            DuplicateOverlay
+          </div>
+          <div class="flow-arrow"><span class="flow-label">undo</span></div>
+          <div class="flow-node" style="background: var(--blue-dim); color: var(--blue); border-color: rgba(59,130,246,0.2)">
+            API: undoCheckIn
+          </div>
+          <div class="flow-arrow"><span class="flow-label">success</span></div>
+          <div class="flow-node" style="background: var(--cyan-dim); color: var(--cyan); border-color: rgba(6,182,212,0.2)">
+            Undone State
+          </div>
+          <div class="flow-arrow"><span class="flow-label">3s</span></div>
+          <div class="flow-node" style="background: var(--green-dim); color: var(--green); border-color: rgba(34,197,94,0.2)">
+            Auto-dismiss
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 6: CODE SAMPLES
+         ═══════════════════════════════════ -->
+    <div class="tab-panel" id="panel-code">
+      <h2 class="section-title">Code Samples</h2>
+      <p class="section-desc">
+        Reference implementations for key patterns
+      </p>
+
+      <!-- useCheckInStore -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">
+            <span class="file-icon" style="background: var(--orange-dim); color: var(--orange)">Z</span>
+            stores/useCheckInStore.ts
+          </span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <div class="code-body">
+          <pre><span class="k">import</span> { <span class="f">create</span> } <span class="k">from</span> <span class="s">'zustand'</span>;
+<span class="k">import type</span> { <span class="t">Guest</span>, <span class="t">OverlayType</span> } <span class="k">from</span> <span class="s">'@/types/checkin'</span>;
+
+<span class="k">interface</span> <span class="t">CheckInState</span> {
+  <span class="p">screen</span>: <span class="s">'pin'</span> | <span class="s">'scanner'</span> | <span class="s">'search'</span>;
+  <span class="p">overlay</span>: <span class="t">OverlayType</span> | <span class="k">null</span>;
+  <span class="p">overlayStep</span>: <span class="n">1</span> | <span class="n">2</span>;
+  <span class="p">currentGuest</span>: <span class="t">Guest</span> | <span class="k">null</span>;
+  <span class="p">editAdults</span>: <span class="k">number</span>;
+  <span class="p">editKids</span>: <span class="k">number</span>;
+  <span class="p">searchQuery</span>: <span class="k">string</span>;
+  <span class="p">searchFilter</span>: <span class="s">'all'</span> | <span class="s">'pending'</span> | <span class="s">'checked_in'</span>;
+  <span class="p">codeEntryOpen</span>: <span class="k">boolean</span>;
+  <span class="p">enteredCode</span>: <span class="k">string</span>;
+
+  <span class="c">// Actions</span>
+  <span class="f">setScreen</span>: (s: <span class="t">CheckInState</span>[<span class="s">'screen'</span>]) =&gt; <span class="k">void</span>;
+  <span class="f">showOverlay</span>: (type: <span class="t">OverlayType</span>, guest: <span class="t">Guest</span>) =&gt; <span class="k">void</span>;
+  <span class="f">advanceOverlay</span>: () =&gt; <span class="k">void</span>;
+  <span class="f">dismissOverlay</span>: () =&gt; <span class="k">void</span>;
+  <span class="f">updateEditCounter</span>: (type: <span class="s">'adults'</span> | <span class="s">'kids'</span>, delta: <span class="k">number</span>) =&gt; <span class="k">void</span>;
+  <span class="f">setSearchQuery</span>: (q: <span class="k">string</span>) =&gt; <span class="k">void</span>;
+  <span class="f">setSearchFilter</span>: (f: <span class="t">CheckInState</span>[<span class="s">'searchFilter'</span>]) =&gt; <span class="k">void</span>;
+  <span class="f">toggleCodeEntry</span>: () =&gt; <span class="k">void</span>;
+  <span class="f">setEnteredCode</span>: (c: <span class="k">string</span>) =&gt; <span class="k">void</span>;
+}
+
+<span class="k">export const</span> <span class="f">useCheckInStore</span> = <span class="f">create</span>&lt;<span class="t">CheckInState</span>&gt;((<span class="f">set</span>) =&gt; ({
+  <span class="p">screen</span>: <span class="s">'pin'</span>,
+  <span class="p">overlay</span>: <span class="k">null</span>,
+  <span class="p">overlayStep</span>: <span class="n">1</span>,
+  <span class="p">currentGuest</span>: <span class="k">null</span>,
+  <span class="p">editAdults</span>: <span class="n">0</span>,
+  <span class="p">editKids</span>: <span class="n">0</span>,
+  <span class="p">searchQuery</span>: <span class="s">''</span>,
+  <span class="p">searchFilter</span>: <span class="s">'all'</span>,
+  <span class="p">codeEntryOpen</span>: <span class="k">false</span>,
+  <span class="p">enteredCode</span>: <span class="s">''</span>,
+
+  <span class="f">setScreen</span>: (s) =&gt; <span class="f">set</span>({ <span class="p">screen</span>: s }),
+
+  <span class="f">showOverlay</span>: (type, guest) =&gt;
+    <span class="f">set</span>({
+      <span class="p">overlay</span>: type,
+      <span class="p">overlayStep</span>: <span class="n">1</span>,
+      <span class="p">currentGuest</span>: guest,
+      <span class="p">editAdults</span>: guest.<span class="p">adults</span>,
+      <span class="p">editKids</span>: guest.<span class="p">kids</span>,
+    }),
+
+  <span class="f">advanceOverlay</span>: () =&gt;
+    <span class="f">set</span>({ <span class="p">overlayStep</span>: <span class="n">2</span> }),
+
+  <span class="f">dismissOverlay</span>: () =&gt;
+    <span class="f">set</span>({
+      <span class="p">overlay</span>: <span class="k">null</span>,
+      <span class="p">overlayStep</span>: <span class="n">1</span>,
+      <span class="p">currentGuest</span>: <span class="k">null</span>,
+    }),
+
+  <span class="f">updateEditCounter</span>: (type, delta) =&gt;
+    <span class="f">set</span>((state) =&gt; ({
+      [type === <span class="s">'adults'</span> ? <span class="s">'editAdults'</span> : <span class="s">'editKids'</span>]:
+        Math.<span class="f">max</span>(<span class="n">0</span>, (type === <span class="s">'adults'</span> ? state.<span class="p">editAdults</span> : state.<span class="p">editKids</span>) + delta),
+    })),
+
+  <span class="f">setSearchQuery</span>: (q) =&gt; <span class="f">set</span>({ <span class="p">searchQuery</span>: q }),
+  <span class="f">setSearchFilter</span>: (f) =&gt; <span class="f">set</span>({ <span class="p">searchFilter</span>: f }),
+  <span class="f">toggleCodeEntry</span>: () =&gt;
+    <span class="f">set</span>((state) =&gt; ({ <span class="p">codeEntryOpen</span>: !state.<span class="p">codeEntryOpen</span> })),
+  <span class="f">setEnteredCode</span>: (c) =&gt; <span class="f">set</span>({ <span class="p">enteredCode</span>: c }),
+}));</pre>
+        </div>
+      </div>
+
+      <!-- useCheckIn hook -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">
+            <span class="file-icon" style="background: var(--blue-dim); color: var(--blue)">H</span>
+            hooks/useCheckIn.ts
+          </span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <div class="code-body">
+          <pre><span class="k">import</span> { <span class="f">useMutation</span>, <span class="f">useQueryClient</span> } <span class="k">from</span> <span class="s">'@tanstack/react-query'</span>;
+<span class="k">import</span> { <span class="f">checkInGuest</span>, <span class="f">undoCheckIn</span> } <span class="k">from</span> <span class="s">'@/api/checkin'</span>;
+<span class="k">import</span> { <span class="f">useCheckInStore</span> } <span class="k">from</span> <span class="s">'@/stores/useCheckInStore'</span>;
+<span class="k">import type</span> { <span class="t">CheckInPayload</span> } <span class="k">from</span> <span class="s">'@/types/checkin'</span>;
+
+<span class="k">export function</span> <span class="f">useCheckIn</span>() {
+  <span class="k">const</span> queryClient = <span class="f">useQueryClient</span>();
+  <span class="k">const</span> { advanceOverlay, dismissOverlay } = <span class="f">useCheckInStore</span>();
+
+  <span class="k">const</span> checkIn = <span class="f">useMutation</span>({
+    <span class="p">mutationFn</span>: (payload: <span class="t">CheckInPayload</span>) =&gt;
+      <span class="f">checkInGuest</span>(payload),
+    <span class="p">onSuccess</span>: () =&gt; {
+      queryClient.<span class="f">invalidateQueries</span>({ <span class="p">queryKey</span>: [<span class="s">'guests'</span>] });
+      queryClient.<span class="f">invalidateQueries</span>({ <span class="p">queryKey</span>: [<span class="s">'stats'</span>] });
+      <span class="f">advanceOverlay</span>();
+      <span class="f">setTimeout</span>(<span class="f">dismissOverlay</span>, <span class="n">3000</span>);
+    },
+  });
+
+  <span class="k">const</span> undo = <span class="f">useMutation</span>({
+    <span class="p">mutationFn</span>: (guestId: <span class="k">string</span>) =&gt;
+      <span class="f">undoCheckIn</span>(guestId),
+    <span class="p">onSuccess</span>: () =&gt; {
+      queryClient.<span class="f">invalidateQueries</span>({ <span class="p">queryKey</span>: [<span class="s">'guests'</span>] });
+      queryClient.<span class="f">invalidateQueries</span>({ <span class="p">queryKey</span>: [<span class="s">'stats'</span>] });
+      <span class="f">advanceOverlay</span>();
+      <span class="f">setTimeout</span>(<span class="f">dismissOverlay</span>, <span class="n">3000</span>);
+    },
+  });
+
+  <span class="k">return</span> { checkIn, undo };
+}</pre>
+        </div>
+      </div>
+
+      <!-- SuccessOverlay component -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">
+            <span class="file-icon" style="background: var(--green-dim); color: var(--green)">R</span>
+            features/checkin/components/SuccessOverlay/index.tsx
+          </span>
+          <span class="code-lang">TSX</span>
+        </div>
+        <div class="code-body">
+          <pre><span class="k">import</span> { <span class="f">useCheckInStore</span> } <span class="k">from</span> <span class="s">'@/stores/useCheckInStore'</span>;
+<span class="k">import</span> { <span class="f">useCheckIn</span> } <span class="k">from</span> <span class="s">'@/hooks/useCheckIn'</span>;
+<span class="k">import</span> { <span class="t">AnimatedIcon</span> } <span class="k">from</span> <span class="s">'@/components/AnimatedIcon'</span>;
+<span class="k">import</span> <span class="s">'./index.scss'</span>;
+
+<span class="k">export function</span> <span class="f">SuccessOverlay</span>() {
+  <span class="k">const</span> {
+    overlay, overlayStep, currentGuest,
+    editAdults, editKids,
+    updateEditCounter, dismissOverlay,
+  } = <span class="f">useCheckInStore</span>();
+
+  <span class="k">const</span> { checkIn } = <span class="f">useCheckIn</span>();
+
+  <span class="k">if</span> (overlay !== <span class="s">'success'</span> || !currentGuest) <span class="k">return null</span>;
+
+  <span class="k">const</span> handleConfirm = () =&gt; {
+    checkIn.<span class="f">mutate</span>({
+      <span class="p">guestId</span>: currentGuest.<span class="p">id</span>,
+      <span class="p">adults</span>: editAdults,
+      <span class="p">kids</span>: editKids,
+      <span class="p">method</span>: <span class="s">'qr_scan'</span>,
+    });
+  };
+
+  <span class="k">return</span> (
+    &lt;<span class="t">div</span> <span class="p">className</span>=<span class="s">"overlay"</span>&gt;
+      &lt;<span class="t">div</span> <span class="p">className</span>=<span class="s">"overlay-backdrop"</span> /&gt;
+      &lt;<span class="t">div</span> <span class="p">className</span>=<span class="s">"overlay-card"</span>&gt;
+        {overlayStep === <span class="n">1</span> ? (
+          &lt;&gt;
+            &lt;<span class="t">AnimatedIcon</span> <span class="p">type</span>=<span class="s">"success"</span> /&gt;
+            &lt;<span class="t">h2</span>&gt;Guest Found&lt;/<span class="t">h2</span>&gt;
+            <span class="c">{/* ... verify details + counters ... */}</span>
+            &lt;<span class="t">button</span> <span class="p">onClick</span>={handleConfirm}&gt;
+              Confirm Check-In
+            &lt;/<span class="t">button</span>&gt;
+          &lt;/&gt;
+        ) : (
+          &lt;&gt;
+            &lt;<span class="t">AnimatedIcon</span> <span class="p">type</span>=<span class="s">"celebrate"</span> /&gt;
+            &lt;<span class="t">h2</span>&gt;Checked In!&lt;/<span class="t">h2</span>&gt;
+            <span class="c">{/* ... auto-dismiss countdown ... */}</span>
+          &lt;/&gt;
+        )}
+      &lt;/<span class="t">div</span>&gt;
+    &lt;/<span class="t">div</span>&gt;
+  );
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function showTab(id) {
+        document
+          .querySelectorAll('.tab-panel')
+          .forEach((p) => p.classList.remove('active'));
+        document
+          .querySelectorAll('.tab-btn')
+          .forEach((b) => b.classList.remove('active'));
+        document.getElementById('panel-' + id).classList.add('active');
+        const btns = document.querySelectorAll('.tab-btn');
+        const tabs = [
+          'folder',
+          'components',
+          'stores',
+          'types',
+          'flow',
+          'code',
+        ];
+        btns[tabs.indexOf(id)].classList.add('active');
+      }
+    </script>
+  </body>
+</html>

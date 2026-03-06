@@ -1,0 +1,1474 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Family Day 2026 – Check-In</title>
+    <link rel="stylesheet" href="checkin.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- ═══════════ SCREEN 0: PIN ACCESS ═══════════ -->
+    <section id="screen0" class="screen active">
+      <div class="pin-layout">
+        <div class="pin-content">
+          <img
+            src="hashedin-logo.svg"
+            alt="Hashedin by Deloitte"
+            class="pin-logo"
+          />
+          <div class="pin-titles">
+            <span class="pin-event">Family Day</span>
+            <span class="pin-year">2026</span>
+          </div>
+          <p class="pin-subtitle">Staff Check-In Portal</p>
+
+          <div class="pin-dots" id="pinDots">
+            <span class="pin-dot" id="dot0"></span>
+            <span class="pin-dot" id="dot1"></span>
+            <span class="pin-dot" id="dot2"></span>
+            <span class="pin-dot" id="dot3"></span>
+          </div>
+          <p class="pin-hint" id="pinHint">Enter 4-digit access PIN</p>
+
+          <div class="pin-keypad">
+            <button class="pin-key" onclick="pinPress('1')">1</button>
+            <button class="pin-key" onclick="pinPress('2')">2</button>
+            <button class="pin-key" onclick="pinPress('3')">3</button>
+            <button class="pin-key" onclick="pinPress('4')">4</button>
+            <button class="pin-key" onclick="pinPress('5')">5</button>
+            <button class="pin-key" onclick="pinPress('6')">6</button>
+            <button class="pin-key" onclick="pinPress('7')">7</button>
+            <button class="pin-key" onclick="pinPress('8')">8</button>
+            <button class="pin-key" onclick="pinPress('9')">9</button>
+            <button class="pin-key pin-key-blank"></button>
+            <button class="pin-key" onclick="pinPress('0')">0</button>
+            <button class="pin-key pin-key-delete" onclick="pinDelete()">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+                <line x1="18" y1="9" x2="12" y2="15" />
+                <line x1="12" y1="9" x2="18" y2="15" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <p class="pin-demo-hint">
+          Demo PIN: <strong>2026</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════ SCREEN 1: SCANNER ═══════════ -->
+    <section id="screen1" class="screen">
+      <div class="scanner-layout">
+        <!-- Camera Viewfinder -->
+        <div class="viewfinder">
+          <div class="viewfinder-bg">
+            <div class="camera-sim"></div>
+          </div>
+          <div class="scan-frame">
+            <div class="scan-corner tl"></div>
+            <div class="scan-corner tr"></div>
+            <div class="scan-corner bl"></div>
+            <div class="scan-corner br"></div>
+            <div class="scan-line"></div>
+          </div>
+          <p class="scan-hint">Point camera at guest's QR code</p>
+        </div>
+
+        <!-- Bottom Panel -->
+        <div class="bottom-panel">
+          <div class="progress-strip">
+            <div class="progress-info">
+              <span class="progress-text"
+                ><strong id="checkedCount">127</strong> / <span id="totalGuests">350</span> guests</span
+              >
+              <span class="progress-pct" id="progressPct">36%</span>
+            </div>
+            <div class="progress-track">
+              <div
+                class="progress-fill"
+                id="progressFill"
+                style="width: 36%"
+              ></div>
+            </div>
+          </div>
+          <div class="action-btns">
+            <button class="action-btn" onclick="toggleCodeEntry()">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+              Enter Code
+            </button>
+            <button class="action-btn" onclick="showScreen('screen2')">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              Search Guest
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code Entry Sheet -->
+      <div class="code-entry-overlay" id="codeEntry">
+        <div class="code-entry-backdrop" onclick="toggleCodeEntry()"></div>
+        <div class="code-entry-sheet">
+          <div class="code-entry-handle"></div>
+          <div class="code-entry-header">
+            <span class="code-entry-title">Enter Registration Code</span>
+            <button class="code-entry-close" onclick="toggleCodeEntry()">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          <p class="code-entry-desc">
+            Enter the 6-digit code shown on the guest's confirmation screen
+          </p>
+          <div class="code-entry-bar">
+            <input
+              class="code-entry-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="000000"
+              id="codeInput"
+            />
+            <button class="code-entry-go" onclick="manualCheckIn()">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SCREEN 2: MANUAL SEARCH ═══════════ -->
+    <section id="screen2" class="screen">
+      <div class="search-layout">
+        <div class="search-header">
+          <button class="back-btn" onclick="showScreen('screen1')">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <span class="search-title">Guest Search</span>
+          <button class="refresh-btn" onclick="refreshSearch(this)">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="23 4 23 10 17 10" />
+              <polyline points="1 20 1 14 7 14" />
+              <path
+                d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div class="search-bar">
+          <svg
+            class="search-bar-icon"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            class="search-input"
+            type="text"
+            placeholder="Search by name, email or code..."
+            id="searchInput"
+            oninput="filterResults()"
+          />
+          <button class="search-clear" onclick="clearSearch()">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setFilter('all')">
+            All
+            <span class="filter-count" id="countAll">8</span>
+          </button>
+          <button class="filter-tab" onclick="setFilter('pending')">
+            Pending
+            <span class="filter-count" id="countPending">5</span>
+          </button>
+          <button class="filter-tab" onclick="setFilter('checked')">
+            Checked In
+            <span class="filter-count" id="countChecked">3</span>
+          </button>
+        </div>
+
+        <div class="results-list" id="resultsList">
+          <!-- Pending guests -->
+          <div
+            class="result-card"
+            data-status="pending"
+            data-name="Priya Sharma"
+            data-email="priya.sharma@deloitte.com"
+            data-code="482719"
+            data-adults="2"
+            data-kids="1"
+            onclick="confirmCheckIn(this)"
+          >
+            <div class="result-status">
+              <span class="status-dot status-pending"></span>
+            </div>
+            <div class="result-info">
+              <span class="result-name">Priya Sharma</span>
+              <span class="result-meta"
+                >priya.sharma@deloitte.com · 482719</span
+              >
+            </div>
+            <span class="result-badge badge-pending">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              Pending
+            </span>
+          </div>
+
+          <div
+            class="result-card"
+            data-status="pending"
+            data-name="Rahul Mehta"
+            data-email="rahul.mehta@deloitte.com"
+            data-code="593104"
+            data-adults="1"
+            data-kids="2"
+            onclick="confirmCheckIn(this)"
+          >
+            <div class="result-status">
+              <span class="status-dot status-pending"></span>
+            </div>
+            <div class="result-info">
+              <span class="result-name">Rahul Mehta</span>
+              <span class="result-meta"
+                >rahul.mehta@deloitte.com · 593104</span
+              >
+            </div>
+            <span class="result-badge badge-pending">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              Pending
+            </span>
+          </div>
+
+          <div
+            class="result-card"
+            data-status="pending"
+            data-name="Ananya Gupta"
+            data-email="ananya.gupta@deloitte.com"
+            data-code="716285"
+            data-adults="3"
+            data-kids="0"
+            onclick="confirmCheckIn(this)"
+          >
+            <div class="result-status">
+              <span class="status-dot status-pending"></span>
+            </div>
+            <div class="result-info">
+              <span class="result-name">Ananya Gupta</span>
+              <span class="result-meta"
+                >ananya.gupta@deloitte.com · 716285</span
+              >
+            </div>
+            <span class="result-badge badge-pending">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              Pending
+            </span>
+          </div>
+
+          <div
+            class="result-card"
+            data-status="pending"
+            data-name="Vikram Patel"
+            data-email="vikram.patel@deloitte.com"
+            data-code="384956"
+            data-adults="2"
+            data-kids="2"
+            onclick="confirmCheckIn(this)"
+          >
+            <div class="result-status">
+              <span class="status-dot status-pending"></span>
+            </div>
+            <div class="result-info">
+              <span class="result-name">Vikram Patel</span>
+              <span class="result-meta"
+                >vikram.patel@deloitte.com · 384956</span
+              >
+            </div>
+            <span class="result-badge badge-pending">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              Pending
+            </span>
+          </div>
+
+          <div
+            class="result-card"
+            data-status="pending"
+            data-name="Neha Iyer"
+            data-email="neha.iyer@deloitte.com"
+            data-code="827341"
+            data-adults="1"
+            data-kids="0"
+            onclick="confirmCheckIn(this)"
+          >
+            <div class="result-status">
+              <span class="status-dot status-pending"></span>
+            </div>
+            <div class="result-info">
+              <span class="result-name">Neha Iyer</span>
+              <span class="result-meta">neha.iyer@deloitte.com · 827341</span>
+            </div>
+            <span class="result-badge badge-pending">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              Pending
+            </span>
+          </div>
+
+          <!-- Checked in guests -->
+          <div
+            class="result-card"
+            data-status="checked"
+            data-name="Arjun Reddy"
+            data-email="arjun.reddy@deloitte.com"
+            data-code="614738"
+            data-adults="2"
+            data-kids="1"
+            onclick="showUndoModal(this)"
+          >
+            <div class="result-status">
+              <span class="status-dot status-checked"></span>
+            </div>
+            <div class="result-info">
+              <span class="result-name">Arjun Reddy</span>
+              <span class="result-meta"
+                >arjun.reddy@deloitte.com · 614738</span
+              >
+            </div>
+            <span class="result-badge badge-checked">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Checked In
+            </span>
+          </div>
+
+          <div
+            class="result-card"
+            data-status="checked"
+            data-name="Shreya Nair"
+            data-email="shreya.nair@deloitte.com"
+            data-code="952163"
+            data-adults="1"
+            data-kids="1"
+            onclick="showUndoModal(this)"
+          >
+            <div class="result-status">
+              <span class="status-dot status-checked"></span>
+            </div>
+            <div class="result-info">
+              <span class="result-name">Shreya Nair</span>
+              <span class="result-meta"
+                >shreya.nair@deloitte.com · 952163</span
+              >
+            </div>
+            <span class="result-badge badge-checked">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Checked In
+            </span>
+          </div>
+
+          <div
+            class="result-card"
+            data-status="checked"
+            data-name="Karan Singh"
+            data-email="karan.singh@deloitte.com"
+            data-code="438291"
+            data-adults="3"
+            data-kids="2"
+            onclick="showUndoModal(this)"
+          >
+            <div class="result-status">
+              <span class="status-dot status-checked"></span>
+            </div>
+            <div class="result-info">
+              <span class="result-name">Karan Singh</span>
+              <span class="result-meta"
+                >karan.singh@deloitte.com · 438291</span
+              >
+            </div>
+            <span class="result-badge badge-checked">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Checked In
+            </span>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-state-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </div>
+          <span class="empty-state-title">No results found</span>
+          <span class="empty-state-desc"
+            >Try a different name, email or code</span
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ OVERLAYS ═══════════ -->
+
+    <!-- Overlay: Success (Verify & Confirm) -->
+    <div class="overlay overlay-success" id="overlaySuccess">
+      <div class="overlay-backdrop"></div>
+      <div class="overlay-card">
+        <!-- Step 1: Verify -->
+        <div class="overlay-step" id="successStep1">
+          <div class="overlay-icon overlay-icon-green icon-animate">
+            <svg
+              class="tick-svg"
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline class="tick-path" points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h2 class="overlay-title">Guest Found</h2>
+          <p class="overlay-sub">Verify details before check-in</p>
+
+          <div class="overlay-details">
+            <div class="detail-row">
+              <span class="detail-label">Name</span>
+              <span class="detail-value" id="successName">Priya Sharma</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Code</span>
+              <span class="detail-value detail-code" id="successCode"
+                >482719</span
+              >
+            </div>
+          </div>
+
+          <div class="edit-counters">
+            <div class="edit-counter-row">
+              <div class="edit-counter-info">
+                <span class="edit-counter-label">Adults</span>
+                <span class="edit-counter-hint"
+                  >Registered: <strong id="regAdults">2</strong></span
+                >
+              </div>
+              <div class="edit-counter-controls">
+                <button
+                  class="edit-counter-btn"
+                  onclick="updateCheckInCounter('adults', -1)"
+                >
+                  −
+                </button>
+                <span class="edit-counter-num" id="editAdults">2</span>
+                <button
+                  class="edit-counter-btn"
+                  onclick="updateCheckInCounter('adults', 1)"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div class="edit-counter-row">
+              <div class="edit-counter-info">
+                <span class="edit-counter-label">Kids</span>
+                <span class="edit-counter-hint"
+                  >Registered: <strong id="regKids">1</strong></span
+                >
+              </div>
+              <div class="edit-counter-controls">
+                <button
+                  class="edit-counter-btn"
+                  onclick="updateCheckInCounter('kids', -1)"
+                >
+                  −
+                </button>
+                <span class="edit-counter-num" id="editKids">1</span>
+                <button
+                  class="edit-counter-btn"
+                  onclick="updateCheckInCounter('kids', 1)"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div class="edit-counter-total">
+              <span>Total checking in</span>
+              <span class="edit-total-num" id="editTotal">3</span>
+            </div>
+          </div>
+
+          <div class="overlay-actions">
+            <button class="btn-outline btn-dismiss" onclick="dismissOverlay()">
+              Cancel
+            </button>
+            <button
+              class="btn-primary btn-confirm"
+              onclick="confirmCheckInStep()"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Confirm Check-In
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Confirmed -->
+        <div class="overlay-step" id="successStep2" style="display: none">
+          <div class="overlay-icon overlay-icon-green icon-celebrate">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline class="tick-path" points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h2 class="overlay-title">Checked In!</h2>
+          <p class="overlay-sub" id="confirmedSub">Welcome, Priya!</p>
+
+          <div class="overlay-details">
+            <div class="detail-row">
+              <span class="detail-label">Party</span>
+              <span class="detail-value confirmed-party" id="confirmedParty"
+                >2 Adults + 1 Kid</span
+              >
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Time</span>
+              <span class="detail-value detail-time" id="confirmedTime"
+                >11:24 AM</span
+              >
+            </div>
+          </div>
+
+          <p class="overlay-dismiss-hint">
+            Auto-closing in <span id="autoDismiss">3</span>s
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay: Duplicate (Already Checked In) -->
+    <div class="overlay overlay-duplicate" id="overlayDuplicate">
+      <div class="overlay-backdrop"></div>
+      <div class="overlay-card">
+        <!-- Step 1: Already checked in -->
+        <div class="overlay-step" id="dupStep1">
+          <div class="overlay-icon overlay-icon-amber icon-animate">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle class="warn-circle" cx="12" cy="12" r="10" />
+              <line class="warn-line" x1="12" y1="8" x2="12" y2="12" />
+              <circle class="warn-dot" cx="12" cy="16" r="0.5" fill="currentColor" />
+            </svg>
+          </div>
+          <h2 class="overlay-title">Already Checked In</h2>
+          <p class="overlay-sub">This guest was checked in earlier today</p>
+
+          <div class="overlay-details">
+            <div class="detail-row">
+              <span class="detail-label">Name</span>
+              <span class="detail-value" id="dupName">Arjun Reddy</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Code</span>
+              <span class="detail-value detail-code" id="dupCode">614738</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Checked in at</span>
+              <span class="detail-value detail-time" id="dupTime">10:45 AM</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Party</span>
+              <span class="detail-value" id="dupParty">2 Adults + 1 Kid</span>
+            </div>
+          </div>
+
+          <div class="overlay-actions">
+            <button class="btn-outline btn-undo" onclick="undoCheckIn()">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline class="undo-arrow" points="1 4 1 10 7 10" />
+                <path
+                  class="undo-arc"
+                  d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"
+                />
+              </svg>
+              Undo Check-In
+            </button>
+            <button class="btn-outline btn-dismiss" onclick="dismissOverlay()">
+              Dismiss
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Undone -->
+        <div class="overlay-step" id="dupStep2" style="display: none">
+          <div class="overlay-icon overlay-icon-blue icon-animate">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline class="undo-arrow" points="1 4 1 10 7 10" />
+              <path
+                class="undo-arc"
+                d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"
+              />
+            </svg>
+          </div>
+          <h2 class="overlay-title">Check-In Undone</h2>
+          <p class="overlay-sub" id="undoSub">
+            Arjun Reddy is back to pending
+          </p>
+
+          <div class="overlay-details">
+            <div class="detail-row">
+              <span class="detail-label">Status</span>
+              <span class="detail-value undo-status-value">Pending</span>
+            </div>
+          </div>
+
+          <p class="overlay-dismiss-hint">
+            Auto-closing in <span id="undoAutoDismiss">3</span>s
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay: Not Found -->
+    <div class="overlay overlay-notfound" id="overlayNotFound">
+      <div class="overlay-backdrop"></div>
+      <div class="overlay-card">
+        <div class="overlay-icon overlay-icon-red icon-animate">
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line class="cross-line-1" x1="15" y1="9" x2="9" y2="15" />
+            <line class="cross-line-2" x1="9" y1="9" x2="15" y2="15" />
+          </svg>
+        </div>
+        <h2 class="overlay-title">Not Found</h2>
+        <p class="overlay-sub">No registration matches this code</p>
+
+        <div
+          class="overlay-details"
+          style="text-align: center; padding: 16px"
+        >
+          <span class="detail-label">Scanned code</span>
+          <p
+            class="detail-value detail-code"
+            id="notFoundCode"
+            style="font-size: 1.2rem; margin-top: 4px"
+          >
+            999999
+          </p>
+        </div>
+
+        <div class="overlay-actions notfound-hint-row">
+          <button class="btn-outline btn-dismiss" onclick="dismissOverlay()">
+            Try Again
+          </button>
+          <button
+            class="btn-primary btn-confirm"
+            onclick="dismissOverlay(); showScreen('screen2')"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            Search Manually
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay: Search Confirm -->
+    <div class="overlay overlay-confirm" id="overlayConfirm">
+      <div class="overlay-backdrop"></div>
+      <div class="overlay-card">
+        <div class="overlay-step" id="confirmStep1">
+          <div class="overlay-icon overlay-icon-orange icon-animate">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </div>
+          <h2 class="overlay-title" id="confirmName">Priya Sharma</h2>
+          <p class="overlay-sub">Confirm check-in for this guest?</p>
+
+          <div class="overlay-details">
+            <div class="detail-row">
+              <span class="detail-label">Email</span>
+              <span class="detail-value" id="confirmEmail"
+                >priya.sharma@deloitte.com</span
+              >
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Code</span>
+              <span class="detail-value detail-code" id="confirmCode"
+                >482719</span
+              >
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Party</span>
+              <span class="detail-value" id="confirmParty"
+                >2 Adults + 1 Kid</span
+              >
+            </div>
+          </div>
+
+          <div class="overlay-actions">
+            <button class="btn-outline btn-dismiss" onclick="dismissOverlay()">
+              Cancel
+            </button>
+            <button
+              class="btn-primary btn-confirm"
+              onclick="doManualCheckIn()"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Check In
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Done -->
+        <div class="overlay-step" id="confirmStep2" style="display: none">
+          <div class="overlay-icon overlay-icon-green icon-celebrate">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline class="tick-path" points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h2 class="overlay-title">Checked In!</h2>
+          <p class="overlay-sub" id="confirmDoneSub">Welcome, Priya!</p>
+
+          <p class="overlay-dismiss-hint">
+            Auto-closing in <span id="confirmAutoDismiss">3</span>s
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay: Search Undo -->
+    <div class="overlay overlay-undo" id="overlayUndo">
+      <div class="overlay-backdrop"></div>
+      <div class="overlay-card">
+        <div class="overlay-step" id="undoStep1">
+          <div class="overlay-icon overlay-icon-amber icon-animate">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle class="warn-circle" cx="12" cy="12" r="10" />
+              <line class="warn-line" x1="12" y1="8" x2="12" y2="12" />
+              <circle class="warn-dot" cx="12" cy="16" r="0.5" fill="currentColor" />
+            </svg>
+          </div>
+          <h2 class="overlay-title" id="undoName">Arjun Reddy</h2>
+          <p class="overlay-sub">This guest is already checked in</p>
+
+          <div class="overlay-details">
+            <div class="detail-row">
+              <span class="detail-label">Code</span>
+              <span class="detail-value detail-code" id="undoCode"
+                >614738</span
+              >
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Party</span>
+              <span class="detail-value" id="undoParty"
+                >2 Adults + 1 Kid</span
+              >
+            </div>
+          </div>
+
+          <div class="overlay-actions">
+            <button class="btn-outline btn-dismiss" onclick="dismissOverlay()">
+              Dismiss
+            </button>
+            <button class="btn-outline btn-undo" onclick="doSearchUndo()">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline class="undo-arrow" points="1 4 1 10 7 10" />
+                <path
+                  class="undo-arc"
+                  d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"
+                />
+              </svg>
+              Undo Check-In
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Undone -->
+        <div class="overlay-step" id="undoStep2" style="display: none">
+          <div class="overlay-icon overlay-icon-blue icon-animate">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline class="undo-arrow" points="1 4 1 10 7 10" />
+              <path
+                class="undo-arc"
+                d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"
+              />
+            </svg>
+          </div>
+          <h2 class="overlay-title">Check-In Undone</h2>
+          <p class="overlay-sub" id="searchUndoSub">
+            Arjun Reddy is back to pending
+          </p>
+
+          <p class="overlay-dismiss-hint">
+            Auto-closing in <span id="searchUndoAutoDismiss">3</span>s
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo Controls (floating) -->
+    <div class="demo-controls" id="demoControls" style="display: none">
+      <span class="demo-label">Demo</span>
+      <button class="demo-btn demo-green" onclick="showOverlay('success')">
+        ✓ Found
+      </button>
+      <button class="demo-btn demo-amber" onclick="showOverlay('duplicate')">
+        ⚠ Duplicate
+      </button>
+      <button class="demo-btn demo-red" onclick="showOverlay('notfound')">
+        ✕ Not Found
+      </button>
+    </div>
+
+    <script>
+      /* ═══════════ PIN Logic ═══════════ */
+      let pin = '';
+      const CORRECT_PIN = '2026';
+
+      function pinPress(digit) {
+        if (pin.length >= 4) return;
+        pin += digit;
+        updatePinDots();
+        if (pin.length === 4) {
+          setTimeout(() => {
+            if (pin === CORRECT_PIN) {
+              showScreen('screen1');
+            } else {
+              document.getElementById('pinDots').classList.add('shake');
+              document
+                .querySelectorAll('.pin-dot')
+                .forEach((d) => d.classList.add('error'));
+              document.getElementById('pinHint').textContent =
+                'Incorrect PIN – try again';
+              document.getElementById('pinHint').classList.add('error');
+              setTimeout(() => {
+                pin = '';
+                updatePinDots();
+                document.getElementById('pinDots').classList.remove('shake');
+                document
+                  .querySelectorAll('.pin-dot')
+                  .forEach((d) => d.classList.remove('error'));
+                document.getElementById('pinHint').textContent =
+                  'Enter 4-digit access PIN';
+                document.getElementById('pinHint').classList.remove('error');
+              }, 800);
+            }
+          }, 200);
+        }
+      }
+
+      function pinDelete() {
+        pin = pin.slice(0, -1);
+        updatePinDots();
+      }
+
+      function updatePinDots() {
+        for (let i = 0; i < 4; i++) {
+          const dot = document.getElementById('dot' + i);
+          dot.classList.toggle('filled', i < pin.length);
+        }
+      }
+
+      /* ═══════════ Screen Navigation ═══════════ */
+      function showScreen(id) {
+        document.querySelectorAll('.screen').forEach((s) => {
+          s.classList.remove('active');
+          s.classList.remove('slide-back');
+        });
+        const target = document.getElementById(id);
+        if (id === 'screen0' || id === 'screen1') {
+          target.classList.add('slide-back');
+        }
+        target.classList.add('active');
+
+        // Show/hide demo controls
+        const demo = document.getElementById('demoControls');
+        demo.style.display = id === 'screen1' ? 'flex' : 'none';
+      }
+
+      /* ═══════════ Overlay System ═══════════ */
+      let autoCloseTimer = null;
+
+      function showOverlay(type) {
+        dismissOverlay();
+        if (type === 'success') {
+          document.getElementById('successStep1').style.display = '';
+          document.getElementById('successStep2').style.display = 'none';
+          document.getElementById('overlaySuccess').classList.add('active');
+        } else if (type === 'duplicate') {
+          document.getElementById('dupStep1').style.display = '';
+          document.getElementById('dupStep2').style.display = 'none';
+          document
+            .getElementById('overlayDuplicate')
+            .classList.remove('is-undone');
+          document.getElementById('overlayDuplicate').classList.add('active');
+        } else if (type === 'notfound') {
+          document.getElementById('overlayNotFound').classList.add('active');
+        }
+      }
+
+      function dismissOverlay() {
+        clearTimeout(autoCloseTimer);
+        document
+          .querySelectorAll('.overlay')
+          .forEach((o) => o.classList.remove('active'));
+      }
+
+      function updateCheckInCounter(type, delta) {
+        const el = document.getElementById(
+          type === 'adults' ? 'editAdults' : 'editKids'
+        );
+        let val = parseInt(el.textContent) + delta;
+        if (val < 0) val = 0;
+        el.textContent = val;
+        if (
+          val !==
+          parseInt(
+            document.getElementById(
+              type === 'adults' ? 'regAdults' : 'regKids'
+            ).textContent
+          )
+        ) {
+          el.classList.add('counter-changed');
+        } else {
+          el.classList.remove('counter-changed');
+        }
+        const a = parseInt(document.getElementById('editAdults').textContent);
+        const k = parseInt(document.getElementById('editKids').textContent);
+        document.getElementById('editTotal').textContent = a + k;
+      }
+
+      function confirmCheckInStep() {
+        document.getElementById('successStep1').style.display = 'none';
+        document.getElementById('successStep2').style.display = '';
+        const name = document
+          .getElementById('successName')
+          .textContent.split(' ')[0];
+        document.getElementById('confirmedSub').textContent =
+          'Welcome, ' + name + '!';
+        const a = parseInt(document.getElementById('editAdults').textContent);
+        const k = parseInt(document.getElementById('editKids').textContent);
+        let party = a + ' Adult' + (a !== 1 ? 's' : '');
+        if (k > 0) party += ' + ' + k + ' Kid' + (k !== 1 ? 's' : '');
+        document.getElementById('confirmedParty').textContent = party;
+        const now = new Date();
+        document.getElementById('confirmedTime').textContent =
+          now.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          });
+
+        // Auto-dismiss countdown
+        let count = 3;
+        document.getElementById('autoDismiss').textContent = count;
+        autoCloseTimer = setInterval(() => {
+          count--;
+          document.getElementById('autoDismiss').textContent = count;
+          if (count <= 0) {
+            clearInterval(autoCloseTimer);
+            dismissOverlay();
+          }
+        }, 1000);
+      }
+
+      /* ═══════════ Code Entry ═══════════ */
+      function toggleCodeEntry() {
+        const el = document.getElementById('codeEntry');
+        el.classList.toggle('active');
+        if (el.classList.contains('active')) {
+          document.getElementById('codeInput').focus();
+        }
+      }
+
+      function manualCheckIn() {
+        const code = document.getElementById('codeInput').value.trim();
+        if (!code) return;
+        toggleCodeEntry();
+        // Demo: show success for valid-looking codes, not-found otherwise
+        if (code.length === 6 && code !== '999999') {
+          showOverlay('success');
+          document.getElementById('successCode').textContent = code;
+        } else {
+          document.getElementById('notFoundCode').textContent = code;
+          showOverlay('notfound');
+        }
+        document.getElementById('codeInput').value = '';
+      }
+
+      /* ═══════════ Search Logic ═══════════ */
+      function filterResults() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('.result-card');
+        let visible = 0;
+        cards.forEach((card) => {
+          const name = card.dataset.name.toLowerCase();
+          const email = card.dataset.email.toLowerCase();
+          const code = card.dataset.code;
+          const matchesSearch = !q || name.includes(q) || email.includes(q) || code.includes(q);
+          const matchesFilter =
+            currentFilter === 'all' || card.dataset.status === currentFilter;
+          card.style.display =
+            matchesSearch && matchesFilter ? '' : 'none';
+          if (matchesSearch && matchesFilter) visible++;
+        });
+        document.getElementById('emptyState').classList.toggle(
+          'visible',
+          visible === 0
+        );
+      }
+
+      let currentFilter = 'all';
+      function setFilter(filter) {
+        currentFilter = filter;
+        document.querySelectorAll('.filter-tab').forEach((t) => {
+          t.classList.toggle(
+            'active',
+            t.textContent.trim().toLowerCase().startsWith(filter === 'all' ? 'all' : filter)
+          );
+        });
+        filterResults();
+      }
+
+      function clearSearch() {
+        document.getElementById('searchInput').value = '';
+        filterResults();
+      }
+
+      function refreshSearch(btn) {
+        btn.classList.add('spinning');
+        setTimeout(() => btn.classList.remove('spinning'), 600);
+      }
+
+      /* ═══════════ Search → Confirm Check-in ═══════════ */
+      let currentCard = null;
+
+      function confirmCheckIn(card) {
+        currentCard = card;
+        document.getElementById('confirmStep1').style.display = '';
+        document.getElementById('confirmStep2').style.display = 'none';
+        document.getElementById('confirmName').textContent = card.dataset.name;
+        document.getElementById('confirmEmail').textContent =
+          card.dataset.email;
+        document.getElementById('confirmCode').textContent = card.dataset.code;
+        const a = parseInt(card.dataset.adults);
+        const k = parseInt(card.dataset.kids);
+        let party = a + ' Adult' + (a !== 1 ? 's' : '');
+        if (k > 0) party += ' + ' + k + ' Kid' + (k !== 1 ? 's' : '');
+        document.getElementById('confirmParty').textContent = party;
+        document.getElementById('overlayConfirm').classList.add('active');
+      }
+
+      function doManualCheckIn() {
+        document.getElementById('confirmStep1').style.display = 'none';
+        document.getElementById('confirmStep2').style.display = '';
+        const name = currentCard.dataset.name.split(' ')[0];
+        document.getElementById('confirmDoneSub').textContent =
+          'Welcome, ' + name + '!';
+
+        // Update card in list
+        if (currentCard) {
+          currentCard.dataset.status = 'checked';
+          currentCard.querySelector('.status-dot').className =
+            'status-dot status-checked';
+          currentCard.querySelector('.result-badge').className =
+            'result-badge badge-checked';
+          currentCard.querySelector('.result-badge').innerHTML =
+            '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Checked In';
+          currentCard.onclick = function () {
+            showUndoModal(this);
+          };
+          updateSearchCounts();
+        }
+
+        // Auto-dismiss
+        let count = 3;
+        document.getElementById('confirmAutoDismiss').textContent = count;
+        autoCloseTimer = setInterval(() => {
+          count--;
+          document.getElementById('confirmAutoDismiss').textContent = count;
+          if (count <= 0) {
+            clearInterval(autoCloseTimer);
+            dismissOverlay();
+          }
+        }, 1000);
+      }
+
+      /* ═══════════ Search → Undo Check-in ═══════════ */
+      function showUndoModal(card) {
+        currentCard = card;
+        document.getElementById('undoStep1').style.display = '';
+        document.getElementById('undoStep2').style.display = 'none';
+        document.getElementById('overlayUndo').classList.remove('is-undone');
+        document.getElementById('undoName').textContent = card.dataset.name;
+        document.getElementById('undoCode').textContent = card.dataset.code;
+        const a = parseInt(card.dataset.adults);
+        const k = parseInt(card.dataset.kids);
+        let party = a + ' Adult' + (a !== 1 ? 's' : '');
+        if (k > 0) party += ' + ' + k + ' Kid' + (k !== 1 ? 's' : '');
+        document.getElementById('undoParty').textContent = party;
+        document.getElementById('overlayUndo').classList.add('active');
+      }
+
+      function doSearchUndo() {
+        document.getElementById('undoStep1').style.display = 'none';
+        document.getElementById('undoStep2').style.display = '';
+        document.getElementById('overlayUndo').classList.add('is-undone');
+        document.getElementById('searchUndoSub').textContent =
+          currentCard.dataset.name + ' is back to pending';
+
+        // Update card
+        if (currentCard) {
+          currentCard.dataset.status = 'pending';
+          currentCard.querySelector('.status-dot').className =
+            'status-dot status-pending';
+          currentCard.querySelector('.result-badge').className =
+            'result-badge badge-pending';
+          currentCard.querySelector('.result-badge').innerHTML =
+            '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg> Pending';
+          currentCard.onclick = function () {
+            confirmCheckIn(this);
+          };
+          updateSearchCounts();
+        }
+
+        // Auto-dismiss
+        let count = 3;
+        document.getElementById('searchUndoAutoDismiss').textContent = count;
+        autoCloseTimer = setInterval(() => {
+          count--;
+          document.getElementById('searchUndoAutoDismiss').textContent = count;
+          if (count <= 0) {
+            clearInterval(autoCloseTimer);
+            dismissOverlay();
+          }
+        }, 1000);
+      }
+
+      function undoCheckIn() {
+        document.getElementById('dupStep1').style.display = 'none';
+        document.getElementById('dupStep2').style.display = '';
+        document
+          .getElementById('overlayDuplicate')
+          .classList.add('is-undone');
+        const name = document.getElementById('dupName').textContent;
+        document.getElementById('undoSub').textContent =
+          name + ' is back to pending';
+
+        // Auto-dismiss
+        let count = 3;
+        document.getElementById('undoAutoDismiss').textContent = count;
+        autoCloseTimer = setInterval(() => {
+          count--;
+          document.getElementById('undoAutoDismiss').textContent = count;
+          if (count <= 0) {
+            clearInterval(autoCloseTimer);
+            dismissOverlay();
+          }
+        }, 1000);
+      }
+
+      function updateSearchCounts() {
+        const all = document.querySelectorAll('.result-card');
+        const pending = document.querySelectorAll(
+          '.result-card[data-status="pending"]'
+        );
+        const checked = document.querySelectorAll(
+          '.result-card[data-status="checked"]'
+        );
+        document.getElementById('countAll').textContent = all.length;
+        document.getElementById('countPending').textContent = pending.length;
+        document.getElementById('countChecked').textContent = checked.length;
+      }
+    </script>
+  </body>
+</html>

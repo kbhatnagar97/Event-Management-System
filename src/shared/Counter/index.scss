@@ -1,0 +1,90 @@
+.counter-card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 12px 10px 10px;
+  text-align: center;
+
+  &__icon {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 6px;
+    background: var(--orange-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--orange);
+
+    &--kids {
+      background: #fff8ee;
+      color: #e6a030;
+    }
+  }
+
+  &__label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  &__display {
+    text-align: center;
+    min-width: 36px;
+  }
+
+  &__num {
+    display: block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--orange);
+    line-height: 1;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    &.pop {
+      animation: numPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+  }
+}
+
+.counter-btn {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  &:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: var(--orange-light);
+    transform: scale(1.08);
+  }
+
+  &:active { transform: scale(0.95); }
+}
+
+@keyframes numPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
