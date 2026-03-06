@@ -10,12 +10,18 @@ export function SuccessOverlay() {
   const [countdown, setCountdown] = useState(3);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Reset step when overlay opens
+  // Reset step when overlay opens; ensure dismissOverlay on unmount if timer active
   useEffect(() => {
     setStep(1);
     setCountdown(3);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [currentGuest?.id]);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+        dismissOverlay();
+      }
+    };
+  }, [currentGuest?.id, dismissOverlay]);
 
   const handleConfirm = () => {
     if (!currentGuest) return;

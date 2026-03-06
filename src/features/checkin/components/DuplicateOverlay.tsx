@@ -13,8 +13,14 @@ export function DuplicateOverlay() {
   useEffect(() => {
     setStep(1);
     setCountdown(3);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [currentGuest?.id]);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+        dismissOverlay();
+      }
+    };
+  }, [currentGuest?.id, dismissOverlay]);
 
   if (!currentGuest) return null;
 
