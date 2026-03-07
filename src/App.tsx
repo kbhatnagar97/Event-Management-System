@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename="/familyday">
         <Routes>
           {/* Registration flow — nested under shared layout */}
           <Route element={<RegistrationLayout />}>
