@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound Sampler — Success + Error</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f5f5; color: #1a1a2e;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 28px 16px 60px; min-height: 100vh;
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 4px; }
+  p.sub { color: #666; margin-bottom: 20px; font-size: 0.82rem; text-align: center; line-height: 1.5; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 460px; width: 100%; }
+  .card {
+    background: #fff; border-radius: 14px; padding: 16px 12px;
+    text-align: center; cursor: pointer; border: 2px solid transparent;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+  }
+  .card:active { transform: scale(0.96); }
+  .card .emoji { font-size: 1.6rem; margin-bottom: 6px; }
+  .card .name { font-weight: 700; font-size: 0.82rem; margin-bottom: 2px; }
+  .card .desc { font-size: 0.65rem; color: #888; line-height: 1.3; }
+  .success:hover { border-color: #22c55e; }
+  .error:hover { border-color: #ef4444; }
+  .section {
+    width: 100%; max-width: 460px; margin: 22px 0 8px;
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; padding-left: 4px;
+  }
+  .section.s-success { color: #22c55e; }
+  .section.s-error { color: #ef4444; }
+  .tip {
+    max-width: 460px; width: 100%; background: #fff; border-radius: 12px;
+    padding: 14px 16px; margin: 20px 0 0; font-size: 0.75rem; color: #666;
+    line-height: 1.5; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .tip strong { color: #333; }
+  .pick { margin-top: 20px; font-size: 0.82rem; color: #999; }
+</style>
+</head>
+<body>
+
+<h1>🔊 Sound Sampler</h1>
+<p class="sub">Based on Google Material Design &amp; Apple HIG research.<br>Tap each card to hear it.</p>
+
+<div class="tip">
+  <strong>🎯 Research says:</strong> Success → upward melody, bright timbre, sharp attack.<br>
+  Error → downward motion, muted timbre, heavier feel.
+</div>
+
+<!-- ═══════════ SUCCESS SOUNDS ═══════════ -->
+<div class="section s-success">✅ Success — QR Scanned / Check-In Confirmed</div>
+<div class="grid">
+
+  <div class="card success" onclick="s1()">
+    <div class="emoji">🍎</div>
+    <div class="name">S1. Apple Pay</div>
+    <div class="desc">Two pips E5→E6. Clean, confident, iconic</div>
+  </div>
+
+  <div class="card success" onclick="s2()">
+    <div class="emoji">💳</div>
+    <div class="name">S2. NFC Confirm</div>
+    <div class="desc">Soft double-pop at 1.2kHz. Contactless tap</div>
+  </div>
+
+  <div class="card success" onclick="s3()">
+    <div class="emoji">✨</div>
+    <div class="name">S3. Rising Chirp</div>
+    <div class="desc">A5→D6 sine sweep. Quick &amp; bright (current)</div>
+  </div>
+
+  <div class="card success" onclick="s4()">
+    <div class="emoji">🔔</div>
+    <div class="name">S4. Gentle Ding</div>
+    <div class="desc">C6 sine with warm decay. Elegant bell</div>
+  </div>
+
+  <div class="card success" onclick="s5()">
+    <div class="emoji">🎵</div>
+    <div class="name">S5. Major Third</div>
+    <div class="desc">C5→E5. Musical "yes!" interval. Warm &amp; pleasant</div>
+  </div>
+
+  <div class="card success" onclick="s6()">
+    <div class="emoji">📲</div>
+    <div class="name">S6. Wallet Scan</div>
+    <div class="desc">F6→Bb6. iOS boarding pass style</div>
+  </div>
+
+  <div class="card success" onclick="s7()">
+    <div class="emoji">🛎️</div>
+    <div class="name">S7. Bright Arpeggio</div>
+    <div class="desc">C→E→G rising. Cash register / retail</div>
+  </div>
+
+  <div class="card success" onclick="s8()">
+    <div class="emoji">🎹</div>
+    <div class="name">S8. Piano Ping</div>
+    <div class="desc">High C7 with crystal decay. Minimal luxe</div>
+  </div>
+
+  <div class="card success" onclick="s9()">
+    <div class="emoji">🪙</div>
+    <div class="name">S9. Coin Collect</div>
+    <div class="desc">B5→E6 square wave. Playful & satisfying</div>
+  </div>
+
+  <div class="card success" onclick="s10()">
+    <div class="emoji">🔓</div>
+    <div class="name">S10. Unlock Sweep</div>
+    <div class="desc">A4→A6 fast sweep. Tesla / car unlock</div>
+  </div>
+
+  <div class="card success" onclick="s11()">
+    <div class="emoji">🎶</div>
+    <div class="name">S11. Success Chord</div>
+    <div class="desc">C+E+G major triad. Warm &amp; complete</div>
+  </div>
+
+  <div class="card success" onclick="s12()">
+    <div class="emoji">⚡</div>
+    <div class="name">S12. Quick Zap</div>
+    <div class="desc">Triangle 1.5kHz→2.5kHz. Tiny &amp; futuristic</div>
+  </div>
+
+</div>
+
+<!-- ═══════════ ERROR SOUNDS ═══════════ -->
+<div class="section s-error">❌ Error — Not Found / Failed</div>
+<div class="grid">
+
+  <div class="card error" onclick="e1()">
+    <div class="emoji">🚫</div>
+    <div class="name">E1. Low Buzz</div>
+    <div class="desc">200Hz dull buzz. "Nope" — unmistakable</div>
+  </div>
+
+  <div class="card error" onclick="e2()">
+    <div class="emoji">📉</div>
+    <div class="name">E2. Falling Tone</div>
+    <div class="desc">E5→C4 downward slide. Something went wrong</div>
+  </div>
+
+  <div class="card error" onclick="e3()">
+    <div class="emoji">🔕</div>
+    <div class="name">E3. Double Knock</div>
+    <div class="desc">Two low 300Hz thuds. Denied / blocked</div>
+  </div>
+
+  <div class="card error" onclick="e4()">
+    <div class="emoji">⚠️</div>
+    <div class="name">E4. Gentle Warning</div>
+    <div class="desc">Minor third G→Eb. Soft "uh oh"</div>
+  </div>
+
+  <div class="card error" onclick="e5()">
+    <div class="emoji">❗</div>
+    <div class="name">E5. Muted Blip</div>
+    <div class="desc">Low triangle 400Hz. Subtle & non-harsh</div>
+  </div>
+
+  <div class="card error" onclick="e6()">
+    <div class="emoji">🔻</div>
+    <div class="name">E6. Triple Drop</div>
+    <div class="desc">E→D→C descending. Clear "no" pattern</div>
+  </div>
+
+</div>
+
+<p class="pick">Tell me "S_" for success and "E_" for error! 🎯</p>
+
+<script>
+function ac() { return new (window.AudioContext || window.webkitAudioContext)(); }
+
+// ═══ SUCCESS SOUNDS ═══
+
+// S1. Apple Pay double-pip
+function s1() {
+  const c = ac();
+  [0, 0.1].forEach((t, i) => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.type = 'sine';
+    o.frequency.setValueAtTime(i === 0 ? 659.25 : 1318.5, c.currentTime + t);
+    g.gain.setValueAtTime(0, c.currentTime + t);
+    g.gain.linearRampToValueAtTime(0.16, c.currentTime + t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + 0.09);
+    o.start(c.currentTime + t); o.stop(c.currentTime + t + 0.09);
+  });
+  setTimeout(() => c.close(), 350);
+}
+
+// S2. NFC Confirm — soft double pop
+function s2() {
+  const c = ac();
+  [0, 0.065].forEach((t) => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.type = 'sine';
+    o.frequency.setValueAtTime(1200, c.currentTime + t);
+    g.gain.setValueAtTime(0, c.currentTime + t);
+    g.gain.linearRampToValueAtTime(0.14, c.currentTime + t + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + 0.04);
+    o.start(c.currentTime + t); o.stop(c.currentTime + t + 0.04);
+  });
+  setTimeout(() => c.close(), 200);
+}
+
+// S3. Rising Chirp (current)
+function s3() {
+  const c = ac(), o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(c.destination); o.type = 'sine';
+  o.frequency.setValueAtTime(880, c.currentTime);
+  o.frequency.setValueAtTime(1174.66, c.currentTime + 0.08);
+  g.gain.setValueAtTime(0.18, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.18);
+  o.start(); o.stop(c.currentTime + 0.18); o.onended = () => c.close();
+}
+
+// S4. Gentle Ding
+function s4() {
+  const c = ac(), o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(c.destination); o.type = 'sine';
+  o.frequency.setValueAtTime(1046.5, c.currentTime);
+  g.gain.setValueAtTime(0.2, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.35);
+  o.start(); o.stop(c.currentTime + 0.35); o.onended = () => c.close();
+}
+
+// S5. Major Third (C5→E5 — the "yes!" interval)
+function s5() {
+  const c = ac();
+  [{f:523.25, t:0, d:0.12}, {f:659.25, t:0.1, d:0.18}].forEach(({f,t,d}) => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.type = 'sine';
+    o.frequency.setValueAtTime(f, c.currentTime + t);
+    g.gain.setValueAtTime(0, c.currentTime + t);
+    g.gain.linearRampToValueAtTime(0.16, c.currentTime + t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + d);
+    o.start(c.currentTime + t); o.stop(c.currentTime + t + d);
+  });
+  setTimeout(() => c.close(), 400);
+}
+
+// S6. Wallet Scan (iOS boarding pass)
+function s6() {
+  const c = ac();
+  [{f:1396.91,t:0,d:0.06},{f:1864.66,t:0.08,d:0.09}].forEach(({f,t,d}) => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.type = 'sine';
+    o.frequency.setValueAtTime(f, c.currentTime + t);
+    g.gain.setValueAtTime(0, c.currentTime + t);
+    g.gain.linearRampToValueAtTime(0.14, c.currentTime + t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + d);
+    o.start(c.currentTime + t); o.stop(c.currentTime + t + d);
+  });
+  setTimeout(() => c.close(), 300);
+}
+
+// S7. Bright Arpeggio (C→E→G)
+function s7() {
+  const c = ac();
+  [1046.5, 1318.5, 1568].forEach((f, i) => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.type = 'sine';
+    const t = i * 0.055;
+    o.frequency.setValueAtTime(f, c.currentTime + t);
+    g.gain.setValueAtTime(0.14, c.currentTime + t);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + 0.12);
+    o.start(c.currentTime + t); o.stop(c.currentTime + t + 0.12);
+  });
+  setTimeout(() => c.close(), 350);
+}
+
+// S8. Piano Ping (high C7)
+function s8() {
+  const c = ac(), o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(c.destination); o.type = 'sine';
+  o.frequency.setValueAtTime(2093, c.currentTime);
+  g.gain.setValueAtTime(0.16, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.22);
+  o.start(); o.stop(c.currentTime + 0.22); o.onended = () => c.close();
+}
+
+// S9. Coin Collect (B5→E6)
+function s9() {
+  const c = ac();
+  [{f:987.77,t:0,d:0.07},{f:1318.5,t:0.07,d:0.2}].forEach(({f,t,d}) => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.type = 'square';
+    o.frequency.setValueAtTime(f, c.currentTime + t);
+    g.gain.setValueAtTime(0.08, c.currentTime + t);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + d);
+    o.start(c.currentTime + t); o.stop(c.currentTime + t + d);
+  });
+  setTimeout(() => c.close(), 400);
+}
+
+// S10. Unlock Sweep (A4→A6)
+function s10() {
+  const c = ac(), o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(c.destination); o.type = 'sine';
+  o.frequency.setValueAtTime(440, c.currentTime);
+  o.frequency.exponentialRampToValueAtTime(1760, c.currentTime + 0.14);
+  g.gain.setValueAtTime(0.15, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.2);
+  o.start(); o.stop(c.currentTime + 0.2); o.onended = () => c.close();
+}
+
+// S11. Success Chord (C major triad)
+function s11() {
+  const c = ac();
+  [523.25, 659.25, 783.99].forEach(f => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.type = 'sine';
+    o.frequency.setValueAtTime(f, c.currentTime);
+    g.gain.setValueAtTime(0.09, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.3);
+    o.start(); o.stop(c.currentTime + 0.3);
+  });
+  setTimeout(() => c.close(), 450);
+}
+
+// S12. Quick Zap (triangle sweep up)
+function s12() {
+  const c = ac(), o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(c.destination); o.type = 'triangle';
+  o.frequency.setValueAtTime(1500, c.currentTime);
+  o.frequency.exponentialRampToValueAtTime(2500, c.currentTime + 0.06);
+  g.gain.setValueAtTime(0.15, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.1);
+  o.start(); o.stop(c.currentTime + 0.1); o.onended = () => c.close();
+}
+
+// ═══ ERROR SOUNDS ═══
+
+// E1. Low Buzz — dull 200Hz
+function e1() {
+  const c = ac(), o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(c.destination); o.type = 'sine';
+  o.frequency.setValueAtTime(200, c.currentTime);
+  g.gain.setValueAtTime(0.18, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.25);
+  o.start(); o.stop(c.currentTime + 0.25); o.onended = () => c.close();
+}
+
+// E2. Falling Tone — E5→C4
+function e2() {
+  const c = ac(), o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(c.destination); o.type = 'sine';
+  o.frequency.setValueAtTime(659.25, c.currentTime);
+  o.frequency.exponentialRampToValueAtTime(261.63, c.currentTime + 0.2);
+  g.gain.setValueAtTime(0.16, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.28);
+  o.start(); o.stop(c.currentTime + 0.28); o.onended = () => c.close();
+}
+
+// E3. Double Knock — two low thuds
+function e3() {
+  const c = ac();
+  [0, 0.12].forEach(t => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.type = 'sine';
+    o.frequency.setValueAtTime(300, c.currentTime + t);
+    g.gain.setValueAtTime(0, c.currentTime + t);
+    g.gain.linearRampToValueAtTime(0.18, c.currentTime + t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + 0.08);
+    o.start(c.currentTime + t); o.stop(c.currentTime + t + 0.08);
+  });
+  setTimeout(() => c.close(), 300);
+}
+
+// E4. Gentle Warning — minor third G→Eb (sad interval)
+function e4() {
+  const c = ac();
+  [{f:783.99,t:0,d:0.12},{f:622.25,t:0.1,d:0.18}].forEach(({f,t,d}) => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.type = 'sine';
+    o.frequency.setValueAtTime(f, c.currentTime + t);
+    g.gain.setValueAtTime(0, c.currentTime + t);
+    g.gain.linearRampToValueAtTime(0.14, c.currentTime + t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + d);
+    o.start(c.currentTime + t); o.stop(c.currentTime + t + d);
+  });
+  setTimeout(() => c.close(), 400);
+}
+
+// E5. Muted Blip — low triangle
+function e5() {
+  const c = ac(), o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(c.destination); o.type = 'triangle';
+  o.frequency.setValueAtTime(400, c.currentTime);
+  g.gain.setValueAtTime(0.15, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.15);
+  o.start(); o.stop(c.currentTime + 0.15); o.onended = () => c.close();
+}
+
+// E6. Triple Drop — E→D→C descending
+function e6() {
+  const c = ac();
+  [659.25, 587.33, 523.25].forEach((f, i) => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.type = 'sine';
+    const t = i * 0.09;
+    o.frequency.setValueAtTime(f, c.currentTime + t);
+    g.gain.setValueAtTime(0.13, c.currentTime + t);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + 0.1);
+    o.start(c.currentTime + t); o.stop(c.currentTime + t + 0.1);
+  });
+  setTimeout(() => c.close(), 450);
+}
+</script>
+</body>
+</html>
