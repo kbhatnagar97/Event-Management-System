@@ -4,7 +4,7 @@ import { useCheckIn } from '@/hooks/useCheckIn';
 import { formatName, pluralize } from '@/lib/helpers';
 
 export function SuccessOverlay() {
-  const { currentGuest, editAdults, editKids, editSeniors, setEditAdults, setEditKids, setEditSeniors, dismissOverlay } = useCheckInStore();
+  const { currentGuest, editAdults, editKids, editSeniors, setEditAdults, setEditKids, setEditSeniors, dismissOverlay, updateCurrentGuest } = useCheckInStore();
   const { checkIn } = useCheckIn();
   const [step, setStep] = useState<1 | 2>(1);
   const [countdown, setCountdown] = useState(3);
@@ -34,7 +34,8 @@ export function SuccessOverlay() {
         method: 'manual_code',
       },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          updateCurrentGuest(data.guest);
           setStep(2);
           let c = 3;
           setCountdown(c);

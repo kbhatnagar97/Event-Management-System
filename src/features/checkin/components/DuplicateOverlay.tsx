@@ -4,7 +4,7 @@ import { useCheckIn } from '@/hooks/useCheckIn';
 import { formatName } from '@/lib/helpers';
 
 export function DuplicateOverlay() {
-  const { currentGuest, dismissOverlay } = useCheckInStore();
+  const { currentGuest, dismissOverlay, updateCurrentGuest } = useCheckInStore();
   const { undo } = useCheckIn();
   const [step, setStep] = useState<1 | 2>(1);
   const [countdown, setCountdown] = useState(3);
@@ -37,7 +37,8 @@ export function DuplicateOverlay() {
 
   const handleUndo = () => {
     undo.mutate(currentGuest.id, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        updateCurrentGuest(data.guest);
         setStep(2);
         let c = 3;
         setCountdown(c);

@@ -21,6 +21,7 @@ interface CheckInState {
   setEditAdults: (n: number) => void;
   setEditKids: (n: number) => void;
   setEditSeniors: (n: number) => void;
+  updateCurrentGuest: (guest: Guest) => void;
   setSearchQuery: (q: string) => void;
   setSearchFilter: (f: 'all' | 'pending' | 'checked_in') => void;
   reset: () => void;
@@ -42,6 +43,7 @@ export const useCheckInStore = create<CheckInState>((set) => ({
   showOverlay: (overlay, guest) =>
     set({ overlay, currentGuest: guest, editAdults: guest.adults, editKids: guest.kids, editSeniors: guest.seniors }),
   dismissOverlay: () => set({ overlay: null, currentGuest: null }),
+  updateCurrentGuest: (guest) => set({ currentGuest: guest }),
   setEditAdults: (editAdults) => set({ editAdults: Math.max(0, editAdults) }),
   setEditKids: (editKids) => set({ editKids: Math.max(0, editKids) }),
   setEditSeniors: (editSeniors) => set({ editSeniors: Math.max(0, editSeniors) }),
