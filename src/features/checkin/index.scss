@@ -230,6 +230,85 @@
   object-fit: cover;
 }
 
+/* ── Google Pay-style viewfinder overlay ── */
+.scan-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Nudge upward to compensate for the bottom panel so the
+     cutout sits at the true optical center of the screen */
+  padding-bottom: 130px;
+  pointer-events: none;
+}
+
+/* The scan region — transparent square cutout in the center.
+   We use a massive box-shadow as the scrim so the square itself
+   stays perfectly transparent (works in all browsers). */
+.scan-region {
+  position: relative;
+  width: 68vw;
+  max-width: 270px;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  border-radius: 18px;
+  /* Giant shadow IS the scrim — covers the entire viewport */
+  box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.52);
+  animation: scanPulse 2.8s ease-in-out infinite;
+}
+
+/* Corner brackets — outside the clear box with a gap */
+.scan-corner {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border-color: var(--orange);
+  border-style: solid;
+  border-width: 0;
+
+  &.tl {
+    top: -8px; left: -8px;
+    border-top-width: 3.5px;
+    border-left-width: 3.5px;
+    border-top-left-radius: 18px;
+  }
+  &.tr {
+    top: -8px; right: -8px;
+    border-top-width: 3.5px;
+    border-right-width: 3.5px;
+    border-top-right-radius: 18px;
+  }
+  &.bl {
+    bottom: -8px; left: -8px;
+    border-bottom-width: 3.5px;
+    border-left-width: 3.5px;
+    border-bottom-left-radius: 18px;
+  }
+  &.br {
+    bottom: -8px; right: -8px;
+    border-bottom-width: 3.5px;
+    border-right-width: 3.5px;
+    border-bottom-right-radius: 18px;
+  }
+}
+
+@keyframes scanPulse {
+  0%, 100% { transform: scale(1);    opacity: 1;    }
+  50%      { transform: scale(1.025); opacity: 0.88; }
+}
+
+.scan-hint {
+  margin-top: 28px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.82);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.02em;
+}
+
 /* ── Camera status messages ── */
 .camera-status {
   position: absolute;
@@ -242,6 +321,8 @@
   gap: 14px;
   text-align: center;
   padding: 24px;
+  /* Match scan-overlay offset so spinner is visually centered */
+  padding-bottom: 154px;
 
   p {
     font-size: 1rem;
@@ -485,13 +566,13 @@
   position: relative;
   background: var(--surface);
   border-radius: 24px;
-  padding: 28px 24px;
+  padding: 22px 20px;
   max-width: 380px;
   width: 100%;
   box-shadow: var(--shadow-lg);
   animation: cardPop 0.35s var(--ease-back);
   text-align: center;
-  max-height: 90vh;
+  max-height: 92vh;
   overflow-y: auto;
 }
 @keyframes cardPop {
@@ -501,14 +582,19 @@
 
 /* Overlay Icon */
 .overlay-icon {
-  width: 64px; height: 64px;
+  width: 52px; height: 52px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px;
+  margin: 0 auto 12px;
 }
 .overlay-icon-orange { background: rgba(255, 107, 53, 0.1); color: var(--orange); }
+.overlay-icon-solid {
+  background: var(--orange);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(255, 107, 53, 0.45), 0 0 0 6px rgba(255, 107, 53, 0.12);
+}
 .overlay-icon-green { background: var(--green-bg); color: var(--green); }
 .overlay-icon-amber { background: var(--amber-bg); color: var(--amber); }
 .overlay-icon-red { background: var(--red-bg); color: var(--red); }
@@ -528,7 +614,7 @@
 }
 
 /* Tick animation */
-.tick-svg .tick-path {
+.tick-path {
   stroke-dasharray: 40;
   stroke-dashoffset: 40;
   animation: tickDraw 0.4s ease 0.2s forwards;
@@ -556,13 +642,13 @@
 
 /* Cross animation */
 .cross-line-1 {
-  stroke-dasharray: 17;
-  stroke-dashoffset: 17;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
   animation: crossDraw 0.3s ease 0.15s forwards;
 }
 .cross-line-2 {
-  stroke-dasharray: 17;
-  stroke-dashoffset: 17;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
   animation: crossDraw 0.3s ease 0.3s forwards;
 }
 @keyframes crossDraw { to { stroke-dashoffset: 0; } }
@@ -590,7 +676,7 @@
 .overlay-sub {
   font-size: 0.85rem;
   color: var(--text-secondary);
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 /* Details */
@@ -598,20 +684,22 @@
   background: var(--bg);
   border-radius: 14px;
   padding: 2px 0;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
   text-align: left;
 }
 .detail-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 11px 16px;
+  padding: 9px 14px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 .detail-row:last-child { border-bottom: none; }
 .detail-label {
   font-size: 0.82rem;
   color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 .detail-value {
   font-size: 0.85rem;
@@ -631,15 +719,15 @@
 .undo-status-value { color: var(--amber); }
 
 /* Editable Counters in overlay */
-.edit-counters { margin-bottom: 18px; }
+.edit-counters { margin-bottom: 12px; }
 .edit-counter-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 10px 14px;
   background: var(--bg);
   border-radius: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .edit-counter-info { text-align: left; }
 .edit-counter-label {
@@ -657,10 +745,10 @@
 .edit-counter-controls {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 .edit-counter-btn {
-  width: 34px; height: 34px;
+  width: 30px; height: 30px;
   border: 1.5px solid rgba(0, 0, 0, 0.08);
   border-radius: 50%;
   background: var(--surface);
@@ -693,7 +781,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
+  padding: 8px 14px;
   background: var(--bg);
   border-radius: 12px;
   font-size: 0.85rem;
@@ -786,6 +874,78 @@
 
 .notfound-hint-row { gap: 10px; }
 
+/* ── Not Found overlay — red accent bar at top of card ── */
+.overlay-notfound .overlay-card {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-top: 32px; /* extra room for the accent */
+}
+.overlay-notfound .overlay-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--red, #e74c3c);
+}
+
+/* ── Success overlay — orange accent bar ── */
+.overlay-success .overlay-card {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-top: 26px;
+}
+.overlay-success .overlay-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--orange);
+}
+
+/* ── Duplicate overlay — amber accent bar (step 1), blue (step 2 via JS class) ── */
+.overlay-duplicate .overlay-card {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-top: 32px;
+}
+.overlay-duplicate .overlay-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--amber, #f59e0b);
+}
+/* Blue accent when check-in is reversed (step 2) */
+.duplicate-reversed ~ .overlay-card::before,
+.overlay-duplicate .overlay-card:has(.duplicate-reversed)::before {
+  background: var(--blue, #3b82f6) !important;
+}
+.notfound-hint-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg);
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.notfound-hint-icon {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+.notfound-hint-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
 /* ═══════════════════════════════════════
    SCREEN 2: SEARCH
    ═══════════════════════════════════════ */
@@ -806,22 +966,25 @@
   padding: 16px 20px 12px;
   background: var(--surface);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+  .back-btn {
+    width: 38px; height: 38px;
+    min-width: 38px; min-height: 38px;
+    border: none;
+    background: var(--bg);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+    padding: 0;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    box-shadow: none;
+  }
+  .back-btn:active { transform: scale(0.94); }
 }
-.back-btn {
-  width: 38px; height: 38px;
-  border: none;
-  background: var(--bg);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--text);
-  padding: 0;
-  transition: all 0.15s;
-  flex-shrink: 0;
-}
-.back-btn:active { transform: scale(0.94); }
 .search-title {
   flex: 1;
   font-size: 1.1rem;
@@ -987,24 +1150,31 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.result-badge {
+/* Checked-in: green check + timestamp */
+.result-time {
   flex-shrink: 0;
-  padding: 6px 12px;
-  border-radius: 100px;
-  font-size: 0.72rem;
-  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 100px;
+  background: var(--green-bg);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--green);
   white-space: nowrap;
 }
-.badge-pending {
-  background: var(--amber-bg);
-  color: var(--amber);
-}
-.badge-checked {
-  background: var(--green-bg);
-  color: var(--green);
+
+/* Pending: orange "Tap to check in" */
+.result-tap {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border-radius: 100px;
+  background: var(--orange-bg, rgba(255, 122, 0, 0.08));
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--orange);
+  white-space: nowrap;
 }
 
 /* Empty state */

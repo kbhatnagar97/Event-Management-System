@@ -271,6 +271,8 @@ export function ScannerScreen() {
             if (result && !scanLockRef.current && !cancelled) {
               console.log('[QR Scanner] ✅ Decoded:', result);
               scanLockRef.current = true;
+              // Haptic tap — single firm pulse matching Google Pay
+              if (navigator.vibrate) navigator.vibrate(35);
               lookupRef.current(result);
             }
           })
@@ -341,6 +343,17 @@ export function ScannerScreen() {
           muted
         />
 
+        {/* Google Pay-style viewfinder overlay */}
+        <div className="scan-overlay">
+          <div className="scan-region">
+            <span className="scan-corner tl" />
+            <span className="scan-corner tr" />
+            <span className="scan-corner bl" />
+            <span className="scan-corner br" />
+          </div>
+          <p className="scan-hint">Point your camera at a QR code</p>
+        </div>
+
         {/* Camera status indicators */}
         {cameraStatus === 'initializing' && (
           <div className="camera-status">
@@ -381,7 +394,7 @@ export function ScannerScreen() {
         <div className="progress-strip">
           <div className="progress-info">
             <span className="progress-text">
-              <strong>{stats?.checkedIn ?? 0}</strong> / <span>{stats?.total ?? 0}</span> guests
+              <strong>{stats?.checkedIn ?? 0}</strong> / {stats?.total ?? 0} checked in
             </span>
             <span className="progress-pct">{pct}%</span>
           </div>
@@ -390,19 +403,20 @@ export function ScannerScreen() {
           </div>
         </div>
         <div className="action-btns">
-          <button className="action-btn" onClick={toggleCodeEntry}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="16 18 22 12 16 6" />
-              <polyline points="8 6 2 12 8 18" />
-            </svg>
-            Enter Code
-          </button>
           <button className="action-btn" onClick={() => setScreen('search')}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            Search Guest
+            Search
+          </button>
+          <button className="action-btn" onClick={toggleCodeEntry}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="4" y1="18" x2="14" y2="18" />
+            </svg>
+            Enter Code
           </button>
         </div>
       </div>

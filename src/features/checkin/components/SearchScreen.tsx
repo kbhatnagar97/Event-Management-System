@@ -128,34 +128,34 @@ export function SearchScreen() {
           </div>
         )}
 
-        {allGuests.map((guest) => (
-          <div key={guest.id} className="result-card" onClick={() => handleGuestClick(guest)}>
-            <div className="result-status">
-              <span className={`status-dot ${guest.status === 'checked_in' ? 'status-checked' : 'status-pending'}`} />
-            </div>
-            <div className="result-info">
-              <span className="result-name">{formatName(guest.firstName, guest.lastName)}</span>
-              <span className="result-meta">{guest.email} · {guest.code}</span>
-            </div>
-            <span className={`result-badge ${guest.status === 'checked_in' ? 'badge-checked' : 'badge-pending'}`}>
-              {guest.status === 'checked_in' ? (
-                <>
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+        {allGuests.map((guest) => {
+          const checkedIn = guest.status === 'checked_in';
+          const timeStr = guest.checkedInAt
+            ? new Date(guest.checkedInAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
+            : '';
+
+          return (
+            <div key={guest.id} className="result-card" onClick={() => handleGuestClick(guest)}>
+              <div className="result-status">
+                <span className={`status-dot ${checkedIn ? 'status-checked' : 'status-pending'}`} />
+              </div>
+              <div className="result-info">
+                <span className="result-name">{formatName(guest.firstName, guest.lastName)}</span>
+                <span className="result-meta">{guest.email} · {guest.code}</span>
+              </div>
+              {checkedIn ? (
+                <span className="result-time">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Checked In
-                </>
+                  {timeStr}
+                </span>
               ) : (
-                <>
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                    <circle cx="12" cy="12" r="10" />
-                  </svg>
-                  Pending
-                </>
+                <span className="result-tap">Tap to check in</span>
               )}
-            </span>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

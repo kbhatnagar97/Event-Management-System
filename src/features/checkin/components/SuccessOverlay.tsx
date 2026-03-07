@@ -63,24 +63,25 @@ export function SuccessOverlay() {
 
   return (
     <>
-      {/* Step 1: Verify */}
+      {/* Step 1: Verify Attendees */}
       {step === 1 && (
         <div className="overlay-step">
-          <div className="overlay-icon overlay-icon-green icon-animate">
-            <svg className="tick-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline className="tick-path" points="20 6 9 17 4 12" />
+          <div className="overlay-icon overlay-icon-orange icon-animate">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
           </div>
-          <h2 className="overlay-title">Guest Found</h2>
-          <p className="overlay-sub">Verify details before check-in</p>
+          <h2 className="overlay-title">Verify Attendees</h2>
+          <p className="overlay-sub">Confirm or update the party size</p>
 
           <div className="overlay-details">
             <div className="detail-row">
-              <span className="detail-label">Name</span>
+              <span className="detail-label">NAME</span>
               <span className="detail-value">{formatName(currentGuest.firstName, currentGuest.lastName)}</span>
             </div>
             <div className="detail-row">
-              <span className="detail-label">Code</span>
+              <span className="detail-label">CODE</span>
               <span className="detail-value detail-code">{currentGuest.code}</span>
             </div>
           </div>
@@ -120,7 +121,7 @@ export function SuccessOverlay() {
               </div>
             </div>
             <div className="edit-counter-total">
-              <span>Total checking in</span>
+              <span>TOTAL FAMILY MEMBERS</span>
               <span className="edit-total-num">{total}</span>
             </div>
           </div>
@@ -137,25 +138,25 @@ export function SuccessOverlay() {
         </div>
       )}
 
-      {/* Step 2: Confirmed */}
+      {/* Step 2: Checked In! */}
       {step === 2 && (
         <div className="overlay-step">
           <div className="overlay-icon overlay-icon-green icon-celebrate">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline className="tick-path" points="20 6 9 17 4 12" />
+              <polyline className="tick-path" points="4 12 9 17 20 6" />
             </svg>
           </div>
           <h2 className="overlay-title">Checked In!</h2>
-          <p className="overlay-sub">Welcome, {currentGuest.firstName}!</p>
+          <p className="overlay-sub">Successfully verified and checked in</p>
 
           <div className="overlay-details">
             <div className="detail-row">
-              <span className="detail-label">Party</span>
-              <span className="detail-value confirmed-party">{partyText}</span>
+              <span className="detail-label">NAME</span>
+              <span className="detail-value">{formatName(currentGuest.firstName, currentGuest.lastName)}</span>
             </div>
             <div className="detail-row">
-              <span className="detail-label">Time</span>
-              <span className="detail-value detail-time">{new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
+              <span className="detail-label">PARTY SIZE</span>
+              <span className="detail-value confirmed-party">{total} family member{total !== 1 ? 's' : ''}</span>
             </div>
           </div>
 

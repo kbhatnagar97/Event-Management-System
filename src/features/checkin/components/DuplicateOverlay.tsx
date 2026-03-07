@@ -54,44 +54,40 @@ export function DuplicateOverlay() {
   };
 
   return (
-    <>
-      {/* Step 1: Already Checked In */}
+    <div className={`duplicate-wrapper ${step === 2 ? 'duplicate-reversed' : ''}`}>
+      {/* Step 1: Undo Check-In? */}
       {step === 1 && (
         <div className="overlay-step">
           <div className="overlay-icon overlay-icon-amber icon-animate">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle className="warn-circle" cx="12" cy="12" r="10" />
-              <line className="warn-line" x1="12" y1="8" x2="12" y2="12" />
-              <circle className="warn-dot" cx="12" cy="16" r="0.5" fill="currentColor" />
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline className="undo-arrow" points="1 4 1 10 7 10" />
+              <path className="undo-arc" d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
             </svg>
           </div>
-          <h2 className="overlay-title">Already Checked In</h2>
-          <p className="overlay-sub">This guest was checked in earlier today</p>
+          <h2 className="overlay-title">Undo Check-In?</h2>
+          <p className="overlay-sub">This will revert their status to pending</p>
 
           <div className="overlay-details">
             <div className="detail-row">
-              <span className="detail-label">Name</span>
+              <span className="detail-label">NAME</span>
               <span className="detail-value">{fullName}</span>
             </div>
             <div className="detail-row">
-              <span className="detail-label">Code</span>
+              <span className="detail-label">CODE</span>
               <span className="detail-value detail-code">{currentGuest.code}</span>
             </div>
             <div className="detail-row">
-              <span className="detail-label">Checked in at</span>
+              <span className="detail-label">CHECKED IN AT</span>
               <span className="detail-value detail-time">
                 {currentGuest.checkedInAt
                   ? new Date(currentGuest.checkedInAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
                   : '—'}
               </span>
             </div>
-            <div className="detail-row">
-              <span className="detail-label">Party</span>
-              <span className="detail-value">{partyText}</span>
-            </div>
           </div>
 
           <div className="overlay-actions">
+            <button className="btn-outline btn-dismiss" onClick={dismissOverlay}>Cancel</button>
             <button className="btn-outline btn-undo" onClick={handleUndo} disabled={undo.isPending}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline className="undo-arrow" points="1 4 1 10 7 10" />
@@ -99,12 +95,11 @@ export function DuplicateOverlay() {
               </svg>
               Undo Check-In
             </button>
-            <button className="btn-outline btn-dismiss" onClick={dismissOverlay}>Dismiss</button>
           </div>
         </div>
       )}
 
-      {/* Step 2: Undone */}
+      {/* Step 2: Check-In Reversed */}
       {step === 2 && (
         <div className="overlay-step">
           <div className="overlay-icon overlay-icon-blue icon-animate">
@@ -113,12 +108,16 @@ export function DuplicateOverlay() {
               <path className="undo-arc" d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
             </svg>
           </div>
-          <h2 className="overlay-title">Check-In Undone</h2>
-          <p className="overlay-sub">{fullName} is back to pending</p>
+          <h2 className="overlay-title">Check-In Reversed</h2>
+          <p className="overlay-sub">Status has been reverted</p>
 
           <div className="overlay-details">
             <div className="detail-row">
-              <span className="detail-label">Status</span>
+              <span className="detail-label">NAME</span>
+              <span className="detail-value">{fullName}</span>
+            </div>
+            <div className="detail-row">
+              <span className="detail-label">STATUS</span>
               <span className="detail-value undo-status-value">Pending</span>
             </div>
           </div>
@@ -126,6 +125,6 @@ export function DuplicateOverlay() {
           <p className="overlay-dismiss-hint">Auto-closing in <span>{countdown}</span>s</p>
         </div>
       )}
-    </>
+    </div>
   );
 }

@@ -36,9 +36,9 @@ export function FormScreen() {
     <div className="reg-card reg-card--form">
       {/* Brand */}
       <div className="brand brand--sm">
-        <img src="/hashedin-logo.svg" alt="HashedIn by Deloitte" className="brand__logo" />
+        <img src={`${import.meta.env.BASE_URL}hashedin-logo.svg`} alt="HashedIn by Deloitte" className="brand__logo" />
         <span className="brand__divider" />
-        <img src="/hi-engage-logo.svg" alt="Hi Engage" className="brand__logo brand__logo--hi" />
+        <img src={`${import.meta.env.BASE_URL}hi-engage-logo.svg`} alt="Hi Engage" className="brand__logo brand__logo--hi" />
       </div>
 
       {/* Header: Back + email chip */}

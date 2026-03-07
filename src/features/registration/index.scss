@@ -570,6 +570,7 @@
   margin: 4px auto 14px;
   width: 56px;
   height: 56px;
+  filter: drop-shadow(0 3px 10px rgba(255, 107, 53, 0.28)) drop-shadow(0 0 4px rgba(255, 107, 53, 0.12));
   animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
 
