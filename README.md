@@ -1,4 +1,4 @@
-# 🎉 Event Management System — Family Day 2026
+# 🎉 Event Management System
 
 A mobile-first web application for managing event **registration** and **check-in** for Family Day 2026. Built with React, TypeScript, and Vite.
 
@@ -11,8 +11,6 @@ A mobile-first web application for managing event **registration** and **check-i
 <video src="design/demo.webm" controls width="100%">
   Your browser does not support the video tag. <a href="design/demo.webm">Download the demo video</a>.
 </video>
-
-> **Note:** This demo captures the flow **before SSO integration**. Once SSO is enabled, the user's email and name will be auto-populated from the SSO session — the manual input screens for those fields will be removed. All other flows remain the same.
 
 ---
 
