@@ -1,73 +1,106 @@
-# React + TypeScript + Vite
+# 🎉 Event Management System — Family Day 2026
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A mobile-first web application for managing event **registration** and **check-in** for Family Day 2026. Built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📹 Demo
 
-## React Compiler
+> End-to-end walkthrough of the Registration and Check-in flows (pre-SSO).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+https://github.com/user-attachments/assets/demo.webm
 
-## Expanding the ESLint configuration
+The demo video is available locally at [`design/demo.webm`](design/demo.webm).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+> **Note:** This demo captures the flow **before SSO integration**. Once SSO is enabled, the user's email and name will be auto-populated from the SSO session — the manual input screens for those fields will be removed. All other flows remain the same.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## ✨ Features
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Registration Flow
+- **Email entry** — User provides their email to start registration
+- **Form screen** — Collects attendee details (name, guests, seniors, etc.)
+- **Confirmation screen** — Displays a QR code for event-day check-in
+
+### Check-in Flow
+- **PIN-protected access** — Staff enter a PIN to access the check-in kiosk
+- **QR code scanning** — Scan attendee QR codes using the device camera (native `BarcodeDetector` + `jsQR` fallback)
+- **Manual search** — Look up attendees by name or email
+- **Duplicate detection** — Prevents double check-ins with a clear overlay
+- **Success feedback** — Visual + audio confirmation on successful check-in
+- **Not found handling** — Graceful UX when a QR code doesn't match any registration
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 19 + TypeScript |
+| Build Tool | Vite 7 |
+| Routing | React Router v7 |
+| State Management | Zustand |
+| Server State | TanStack React Query |
+| Styling | SCSS Modules |
+| QR Generation | qrcode |
+| QR Scanning | Native BarcodeDetector API + jsQR fallback |
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── api/              # API client with live/mock implementations
+│   ├── live/         # Production API calls
+│   └── mock/         # Mock API for local development
+├── features/
+│   ├── registration/ # Registration flow (Email → Form → Confirm)
+│   └── checkin/      # Check-in flow (PIN → Scan/Search → Result)
+├── hooks/            # Custom hooks (useCheckIn, useRegistration, etc.)
+├── lib/              # Utilities, constants, QR helpers
+├── shared/           # Reusable UI components (Button, Input, Overlay, etc.)
+├── stores/           # Zustand stores
+└── types/            # TypeScript type definitions
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Getting Started
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Prerequisites
+- Node.js ≥ 18
+- npm or yarn
+
+### Installation
+
+```bash
+npm install
 ```
+
+### Development
+
+```bash
+npm run dev
+```
+
+The app runs at `http://localhost:5173/familyday`.
+
+### Build
+
+```bash
+npm run build
+```
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+---
+
+## 📄 API Documentation
+
+See [`design/API_CONTRACTS.md`](design/API_CONTRACTS.md) for the full API contract (v2.0).
